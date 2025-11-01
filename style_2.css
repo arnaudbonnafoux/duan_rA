@@ -1,0 +1,34 @@
+.page-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background: rgba(255, 255, 240, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+}
+
+.page-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2C4251;
+}
+
+.page-container p {
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.page-container a {
+  color: #2C4251;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.page-container a:hover {
+  color: #152028;
+}
+
+.page-container footer {
+  text-align: center;
+  margin-top: 30px;
+}
