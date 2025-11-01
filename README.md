@@ -1,10 +1,13 @@
-# Site vitrine - duan rA
+# duan rA — Site vitrine
 
 Site vitrine dédié à la création numérique.  
-Il présente différentes galeries réalisées à différentes périodes. 
+Il présente différentes galeries réalisées à plusieurs périodes.
 
-## 🛠️ Techno
-HTML5 · CSS3 · JS · GitHub Pages
+## 🛠️ Technologies
+HTML5 · CSS3 · JavaScript · GitHub Pages
+
+## 🌐 En ligne
+https://duanra.duckdns.org
 
 ## 📜 Licence
 Code distribué sous licence MIT.
