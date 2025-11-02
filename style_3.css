@@ -1,0 +1,32 @@
+@media (max-width: 600px) {
+    h1 {
+        font-size: x-large;
+    }
+
+    h2 {
+        font-size: large;
+    }
+
+    .modal-content img {
+        width: 90%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .dimension_icones {
+        width: 20px;
+        height: auto;
+    }
+
+    a {
+        font-size: x-small;
+    }
+
+    .img-wrapper {
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+}
