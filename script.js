@@ -1,6 +1,6 @@
 // Liste des images avec titre
 const images = [
-  { src: 'images/visuel_1.webp', title: 'Silences Chromatiques' },
+  { src: 'images/visuel_1.webp', title: 'Étranger à tout' },
   { src: 'images/visuel_2.webp', title: 'Éclats du Néant' },
   { src: 'images/visuel_3.webp', title: 'Topographie du Rêve' },
   { src: 'images/visuel_4.webp', title: 'Fragment de Temps' },
