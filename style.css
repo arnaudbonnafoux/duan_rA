@@ -6,7 +6,16 @@ body {
 
 .img_header {
   border-radius: 12px;
-  max-width: 150px;}
+  max-width: 150px;
+}
+
+.tagline {
+  font-style: italic;
+  font-size: 0.9rem;
+  color: rgba(52, 11, 90, 0.7);
+  margin: 0;
+  padding-top: 4px;
+}
 
 .div_header {
   margin: 0 auto;
