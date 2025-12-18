@@ -29,9 +29,18 @@
         </div>
     </header>
 
-    <h2>Galerie "Lignes d’Errance"</h2>
+    <h2 id="galleryTitle">Galerie "Lignes d'Errance"</h2>
 
-    <div id="gallery" class="gallery-container" role="main"></div>
+    <!-- Onglet pour galerie 2 -->
+    <div class="tabs-container">
+        <button class="tab-button" id="tabGallery2">Galerie Chromesthésie</button>
+    </div>
+
+    <!-- Galerie 1 (par défaut) -->
+    <div id="gallery1" class="gallery-container" role="main"></div>
+
+    <!-- Galerie 2 (cachée) -->
+    <div id="gallery2" class="gallery-container hidden" role="main" style="display:none;"></div>
 
     <!-- Modale sera générée par le JS -->
 

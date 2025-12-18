@@ -1,65 +1,115 @@
-// Liste des images avec titre
-const images = [
+// Liste des images - Galerie 1
+const images1 = [
   { src: 'images/visuel_1.webp', title: 'Étranger à tout' },
   { src: 'images/visuel_2.webp', title: 'Éclats du Néant' },
   { src: 'images/visuel_3.webp', title: 'Topographie du Rêve' },
   { src: 'images/visuel_4.webp', title: 'Fragment de Temps' },
   { src: 'images/visuel_5.webp', title: 'Mémoire Liquide' },
-  { src: 'images/visuel_6.webp', title: 'Lignes d’Errance' },
+  { src: 'images/visuel_6.webp', title: 'Lignes d\'Errance' },
   { src: 'images/visuel_7.webp', title: 'Spectres de Lumière' },
   { src: 'images/visuel_8.webp', title: 'Respiration du Vide' },
   { src: 'images/visuel_9.webp', title: 'Flux Intemporel' },
   { src: 'images/visuel_10.webp', title: 'Matière du Souffle' },
   { src: 'images/visuel_11.webp', title: 'Échos du Silence' },
   { src: 'images/visuel_12.webp', title: 'Gravité Inversée' },
-  { src: 'images/visuel_13.webp', title: 'Cartographie de l’Invisible' },
+  { src: 'images/visuel_13.webp', title: 'Cartographie de l\'Invisible' },
   { src: 'images/visuel_14.webp', title: 'Osmose des Couleurs' },
 ];
 
-const gallery = document.getElementById('gallery');
+// Liste des images - Galerie 2
+const images2 = [
+  { src: 'images/visuel_23.webp', title: 'Harmonie Chromatique 1' },
+  { src: 'images/visuel_24.webp', title: 'Harmonie Chromatique 2' },
+  { src: 'images/visuel_25.webp', title: 'Harmonie Chromatique 3' },
+  { src: 'images/visuel_26.webp', title: 'Harmonie Chromatique 4' },
+  { src: 'images/visuel_27.webp', title: 'Harmonie Chromatique 5' },
+  { src: 'images/visuel_28.webp', title: 'Harmonie Chromatique 6' },
+  { src: 'images/visuel_29.webp', title: 'Harmonie Chromatique 7' },
+  { src: 'images/visuel_30.webp', title: 'Harmonie Chromatique 8' },
+  { src: 'images/visuel_31.webp', title: 'Harmonie Chromatique 9' },
+];
 
-// Création de la grille
-const grid = document.createElement('div');
-grid.className = 'gallery-grid';
+let currentGallery = 'gallery1';
+let currentImages = images1;
+let currentImageIndex = 0;
 
-images.forEach((img, index) => {
-  const item = document.createElement('div');
-  item.className = 'gallery-item';
-  item.setAttribute('role', 'button');
-  item.setAttribute('tabindex', '0');
-  item.setAttribute('aria-label', `${img.title} - Cliquez pour agrandir`);
+const gallery1 = document.getElementById('gallery1');
+const gallery2 = document.getElementById('gallery2');
 
-  const wrapper = document.createElement('div');
-  wrapper.className = 'img-wrapper';
+// Créer les deux galeries
+function createGallery(containerEl, images) {
+  const grid = document.createElement('div');
+  grid.className = 'gallery-grid';
 
-  const imageEl = document.createElement('img');
-  imageEl.src = img.src;
-  imageEl.alt = img.title;
+  images.forEach((img, index) => {
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
+    item.setAttribute('aria-label', `${img.title} - Cliquez pour agrandir`);
 
-  const title = document.createElement('p');
-  title.className = 'gallery-title';
-  title.textContent = img.title;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'img-wrapper';
 
-  wrapper.appendChild(imageEl);
-  item.appendChild(title);
-  item.appendChild(wrapper);
+    const imageEl = document.createElement('img');
+    imageEl.src = img.src;
+    imageEl.alt = img.title;
 
-  // Modale au clic ou Entrée/Espace
-  item.addEventListener('click', () => openModal(index));
-  item.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      openModal(index);
-    }
+    const title = document.createElement('p');
+    title.className = 'gallery-title';
+    title.textContent = img.title;
+
+    wrapper.appendChild(imageEl);
+    item.appendChild(title);
+    item.appendChild(wrapper);
+
+    // Modale au clic ou Entrée/Espace
+    item.addEventListener('click', () => openModal(index));
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openModal(index);
+      }
+    });
+
+    grid.appendChild(item);
   });
 
-  grid.appendChild(item);
+  containerEl.appendChild(grid);
+}
+
+createGallery(gallery1, images1);
+createGallery(gallery2, images2);
+
+// Gestion des onglets
+const tabGallery2 = document.getElementById('tabGallery2');
+const galleryTitle = document.getElementById('galleryTitle');
+let isGallery2Active = false;
+
+tabGallery2.addEventListener('click', () => {
+  isGallery2Active = !isGallery2Active;
+  
+  gallery1.style.display = isGallery2Active ? 'none' : 'block';
+  gallery2.style.display = isGallery2Active ? 'block' : 'none';
+  
+  tabGallery2.classList.toggle('active', isGallery2Active);
+  
+  // Changer le titre et le texte du bouton
+  if (isGallery2Active) {
+    galleryTitle.textContent = 'Galerie "Chromesthésie"';
+    tabGallery2.textContent = 'Galerie Lignes d\'Errance';
+  } else {
+    galleryTitle.textContent = 'Galerie "Lignes d\'Errance"';
+    tabGallery2.textContent = 'Galerie Chromesthésie';
+  }
+  
+  // Mettre à jour la galerie actuelle
+  currentGallery = isGallery2Active ? 'gallery2' : 'gallery1';
+  currentImages = isGallery2Active ? images2 : images1;
+  currentImageIndex = 0;
 });
 
-gallery.appendChild(grid);
-
 // =================== MODALE ===================
-let currentImageIndex = 0;
 
 const modalOverlay = document.createElement('div');
 modalOverlay.className = 'modal-overlay';
@@ -144,20 +194,20 @@ function openModal(index) {
 }
 
 function updateModalImage() {
-  const img = images[currentImageIndex];
+  const img = currentImages[currentImageIndex];
   modalImage.src = img.src;
   modalImage.alt = img.title;
   modalTitle.textContent = img.title;
-  modalCounter.textContent = `${currentImageIndex + 1} / ${images.length}`;
+  modalCounter.textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
 }
 
 function showNextImage() {
-  currentImageIndex = (currentImageIndex + 1) % images.length;
+  currentImageIndex = (currentImageIndex + 1) % currentImages.length;
   updateModalImage();
 }
 
 function showPreviousImage() {
-  currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+  currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
   updateModalImage();
 }
 
