@@ -36,6 +36,11 @@ let currentImageIndex = 0;
 const gallery1 = document.getElementById('gallery1');
 const gallery2 = document.getElementById('gallery2');
 
+// Vérifier que les conteneurs existent
+if (!gallery1 || !gallery2) {
+  console.error('Erreur: Les conteneurs de galerie n\'existent pas dans le DOM');
+}
+
 // Créer les deux galeries
 function createGallery(containerEl, images) {
   const grid = document.createElement('div');
