@@ -128,6 +128,7 @@ a {
   height: 180px;
   overflow: hidden;
   border-radius: 8px;
+  position: relative;
 }
 
 .img-wrapper img {
@@ -139,6 +140,20 @@ a {
 
 .gallery-item:hover img {
   transform: scale(1.05);
+}
+
+/* Protection contre le téléchargement */
+.image-protection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 10;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .gallery-title {
@@ -172,6 +187,28 @@ a {
   width: 50%;
   height: auto;
   border-radius: 8px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Wrapper pour protection image modale */
+.modal-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Couche invisible de protection sur l'image modale */
+.modal-image-protection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 10;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .modal-title {

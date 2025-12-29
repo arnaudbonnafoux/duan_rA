@@ -6,9 +6,9 @@
 DIR="${1:-.}"
 cd "$DIR" || { echo "Erreur: dossier '$DIR' introuvable"; exit 1; }
 
-echo "🔄 Conversion des images visuel_23 à visuel_31..."
+echo "🔄 Conversion des images visuel_23 à visuel_35..."
 
-for i in {23..31}; do
+for i in {23..35}; do
   FILE="visuel_$i.png"
   OUTPUT="visuel_$i.webp"
   

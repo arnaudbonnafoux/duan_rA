@@ -4,29 +4,30 @@ const images1 = [
   { src: 'images/visuel_2.webp', title: 'Éclats du Néant' },
   { src: 'images/visuel_3.webp', title: 'Topographie du Rêve' },
   { src: 'images/visuel_4.webp', title: 'Fragment de Temps' },
-  { src: 'images/visuel_5.webp', title: 'Mémoire Liquide' },
   { src: 'images/visuel_6.webp', title: 'Lignes d\'Errance' },
   { src: 'images/visuel_7.webp', title: 'Spectres de Lumière' },
   { src: 'images/visuel_8.webp', title: 'Respiration du Vide' },
   { src: 'images/visuel_9.webp', title: 'Flux Intemporel' },
   { src: 'images/visuel_10.webp', title: 'Matière du Souffle' },
   { src: 'images/visuel_11.webp', title: 'Échos du Silence' },
-  { src: 'images/visuel_12.webp', title: 'Gravité Inversée' },
   { src: 'images/visuel_13.webp', title: 'Cartographie de l\'Invisible' },
   { src: 'images/visuel_14.webp', title: 'Osmose des Couleurs' },
 ];
 
 // Liste des images - Galerie 2
 const images2 = [
-  { src: 'images/visuel_23.webp', title: 'Harmonie Chromatique 1' },
-  { src: 'images/visuel_24.webp', title: 'Harmonie Chromatique 2' },
-  { src: 'images/visuel_25.webp', title: 'Harmonie Chromatique 3' },
-  { src: 'images/visuel_26.webp', title: 'Harmonie Chromatique 4' },
-  { src: 'images/visuel_27.webp', title: 'Harmonie Chromatique 5' },
-  { src: 'images/visuel_28.webp', title: 'Harmonie Chromatique 6' },
-  { src: 'images/visuel_29.webp', title: 'Harmonie Chromatique 7' },
-  { src: 'images/visuel_30.webp', title: 'Harmonie Chromatique 8' },
-  { src: 'images/visuel_31.webp', title: 'Harmonie Chromatique 9' },
+  //{ src: 'images/visuel_23.webp', title: 'Harmonie Chromatique 1' },
+  { src: 'images/visuel_24.webp', title: 'Danse des Teintes' },
+  { src: 'images/visuel_25.webp', title: 'Fusion Colorée' },
+  { src: 'images/visuel_26.webp', title: 'Murmures Chromatiques' },
+  { src: 'images/visuel_27.webp', title: 'Symphonie Silencieuse' },
+  { src: 'images/visuel_28.webp', title: 'Vibratos Chromatiques' },
+  { src: 'images/visuel_29.webp', title: 'Consonance Abstraite' },
+  { src: 'images/visuel_30.webp', title: 'Dissonance Harmonieuse' },
+  { src: 'images/visuel_31.webp', title: 'Crescendo Visuel' },
+  { src: 'images/visuel_33.webp', title: 'Vertiges Colorés' },
+  { src: 'images/visuel_34.webp', title: 'Resonance Infinie' },
+  { src: 'images/visuel_35.webp', title: 'Conclusion Onirique' },
 ];
 
 let currentGallery = 'gallery1';
@@ -68,6 +69,23 @@ function createGallery(containerEl, images) {
     item.appendChild(title);
     item.appendChild(wrapper);
 
+    // Ajouter une couche de protection invisible
+    const protectionLayer = document.createElement('div');
+    protectionLayer.className = 'image-protection';
+    wrapper.appendChild(protectionLayer);
+
+    // Bloquer le clic droit sur l'image
+    imageEl.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
+    // Bloquer le drag-drop
+    imageEl.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
     // Modale au clic ou Entrée/Espace
     item.addEventListener('click', () => openModal(index));
     item.addEventListener('keydown', (e) => {
@@ -101,11 +119,11 @@ tabGallery2.addEventListener('click', () => {
   
   // Changer le titre et le texte du bouton
   if (isGallery2Active) {
-    galleryTitle.textContent = 'Galerie "Chromesthésie"';
+    galleryTitle.textContent = 'Galerie "Révolutions Formelles"';
     tabGallery2.textContent = 'Galerie Lignes d\'Errance';
   } else {
     galleryTitle.textContent = 'Galerie "Lignes d\'Errance"';
-    tabGallery2.textContent = 'Galerie Chromesthésie';
+    tabGallery2.textContent = 'Galerie Révolutions Formelles';
   }
   
   // Mettre à jour la galerie actuelle
@@ -134,6 +152,25 @@ prevBtn.addEventListener('click', () => showPreviousImage());
 // Image
 const modalImage = document.createElement('img');
 modalImage.setAttribute('role', 'img');
+
+// Ajouter protection sur l'image modale
+modalImage.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  return false;
+});
+
+modalImage.addEventListener('dragstart', (e) => {
+  e.preventDefault();
+  return false;
+});
+
+// Créer une couche de protection pour la modale
+const modalImageWrapper = document.createElement('div');
+modalImageWrapper.className = 'modal-image-wrapper';
+
+// Créer la couche invisible de protection
+const modalImageProtection = document.createElement('div');
+modalImageProtection.className = 'modal-image-protection';
 
 // Titre + compteur
 const modalInfoContainer = document.createElement('div');
@@ -164,7 +201,9 @@ closeBtn.addEventListener('click', () => closeModal());
 
 modalContent.appendChild(closeBtn);
 modalContent.appendChild(prevBtn);
-modalContent.appendChild(modalImage);
+modalContent.appendChild(modalImageWrapper);
+modalImageWrapper.appendChild(modalImage);
+modalImageWrapper.appendChild(modalImageProtection);
 modalContent.appendChild(modalInfoContainer);
 modalContent.appendChild(nextBtn);
 modalOverlay.appendChild(modalContent);

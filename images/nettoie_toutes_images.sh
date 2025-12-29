@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Liste des extensions à traiter
-extensions=("*.jpg" "*.png")
+extensions=("*.jpg" "*.png" "*.webp")
 
 # Boucle sur chaque type de fichier
 for ext in "${extensions[@]}"; do
