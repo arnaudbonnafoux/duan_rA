@@ -7,7 +7,7 @@ Il présente différentes galeries réalisées à plusieurs périodes.
 HTML5 · CSS3 · JavaScript · GitHub Pages
 
 ## 🌐 En ligne
-https://duanra.duckdns.org
+https://www.duanra.fr
 
 ## 📜 Licence
 Code distribué sous licence MIT.
