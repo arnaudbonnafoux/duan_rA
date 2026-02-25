@@ -104,6 +104,62 @@ function createGallery(containerEl, images) {
 createGallery(gallery1, images1);
 createGallery(gallery2, images2);
 
+// =================== MODALE BIO ===================
+
+const bioBtn = document.getElementById('bioBtn');
+const bioOverlay = document.createElement('div');
+bioOverlay.className = 'bio-overlay';
+bioOverlay.setAttribute('role', 'dialog');
+bioOverlay.setAttribute('aria-label', 'Biographie de l\'artiste');
+
+const bioContent = document.createElement('div');
+bioContent.className = 'bio-content';
+
+const bioCLoseBtn = document.createElement('button');
+bioCLoseBtn.className = 'bio-close';
+bioCLoseBtn.textContent = '×';
+bioCLoseBtn.setAttribute('aria-label', 'Fermer');
+bioCLoseBtn.addEventListener('click', () => closeBioModal());
+
+const bioText = document.createElement('div');
+bioText.className = 'bio-text';
+bioText.innerHTML = `
+  <h2>De Artifice duan rA</h2>
+  <p>Salute in domicilium digitale duan rA, artificis qui limites inter abstractum et concretum, inter ordinem et chaos investigat. Creationes eius, in galleriis "Viae Errantes" et "Revolutiones Formales" congregatae, quaestionem perpetuam pulchritudinis sine fine exprimunt, ubi unaquaeque opus fabulam formarum, colorum et motus narratur.</p>
+  <p>Pulchritudo sine fine - ornamentum aeternum - est philosophia quae artem eius regit.</p>
+`;
+
+bioContent.appendChild(bioCLoseBtn);
+bioContent.appendChild(bioText);
+bioOverlay.appendChild(bioContent);
+document.body.appendChild(bioOverlay);
+
+// Événements modale bio
+bioBtn.addEventListener('click', () => openBioModal());
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && bioOverlay.style.display === 'flex') {
+    closeBioModal();
+  }
+});
+
+bioOverlay.addEventListener('click', (e) => {
+  if (e.target === bioOverlay) {
+    closeBioModal();
+  }
+});
+
+function openBioModal() {
+  bioOverlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  bioCLoseBtn.focus();
+}
+
+function closeBioModal() {
+  bioOverlay.style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
 // Gestion des onglets
 const tabGallery2 = document.getElementById('tabGallery2');
 const galleryTitle = document.getElementById('galleryTitle');

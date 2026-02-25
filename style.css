@@ -272,3 +272,121 @@ a {
   opacity: 0.8;
 }
 
+/* =================== STYLES BIO =================== */
+
+.bio-button {
+  background-color: #340b5a;
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 8px 16px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  margin-top: 16px;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.bio-button:hover {
+  background-color: #fff;
+  color: #340b5a;
+  transform: scale(1.05);
+}
+
+.bio-button:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.bio-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.bio-content {
+  background-color: #340b5a;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bio-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: transform 0.2s ease;
+}
+
+.bio-close:hover {
+  transform: scale(1.2);
+}
+
+.bio-close:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.bio-text h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.bio-text p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+.bio-text p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .bio-content {
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  .bio-text h2 {
+    font-size: 20px;
+  }
+
+  .bio-text p {
+    font-size: 14px;
+  }
+}
