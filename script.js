@@ -192,6 +192,31 @@ nextBtn.textContent = '❯';
 nextBtn.setAttribute('aria-label', 'Image suivante');
 nextBtn.addEventListener('click', () => showNextImage());
 
+// Élément audio
+const modalAudio = document.createElement('audio');
+modalAudio.id = 'modal-audio';
+modalAudio.loop = true;
+modalAudio.preload = 'auto';
+modalAudio.src = 'audio/Life motion-second movement.mp3';
+
+// Bouton de contrôle audio
+const audioToggleBtn = document.createElement('button');
+audioToggleBtn.className = 'modal-audio-btn';
+audioToggleBtn.textContent = '🔊';
+audioToggleBtn.setAttribute('aria-label', 'Activer/désactiver le son');
+let isAudioPlaying = false;
+audioToggleBtn.addEventListener('click', () => {
+  if (isAudioPlaying) {
+    modalAudio.pause();
+    audioToggleBtn.textContent = '🔇';
+    isAudioPlaying = false;
+  } else {
+    modalAudio.play();
+    audioToggleBtn.textContent = '🔊';
+    isAudioPlaying = true;
+  }
+});
+
 // Bouton fermer
 const closeBtn = document.createElement('button');
 closeBtn.className = 'modal-close';
@@ -200,6 +225,7 @@ closeBtn.setAttribute('aria-label', 'Fermer');
 closeBtn.addEventListener('click', () => closeModal());
 
 modalContent.appendChild(closeBtn);
+modalContent.appendChild(audioToggleBtn);
 modalContent.appendChild(prevBtn);
 modalContent.appendChild(modalImageWrapper);
 modalImageWrapper.appendChild(modalImage);
@@ -208,6 +234,7 @@ modalContent.appendChild(modalInfoContainer);
 modalContent.appendChild(nextBtn);
 modalOverlay.appendChild(modalContent);
 document.body.appendChild(modalOverlay);
+document.body.appendChild(modalAudio);
 
 // Fermeture avec Échap
 document.addEventListener('keydown', (e) => {
@@ -235,6 +262,11 @@ function openModal(index) {
   modalOverlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
   closeBtn.focus();
+  // Lancer la musique
+  modalAudio.currentTime = 0;
+  modalAudio.play();
+  isAudioPlaying = true;
+  audioToggleBtn.textContent = '🔊';
 }
 
 function updateModalImage() {
@@ -258,4 +290,9 @@ function showPreviousImage() {
 function closeModal() {
   modalOverlay.style.display = 'none';
   document.body.style.overflow = 'auto';
+  // Arrêter la musique
+  modalAudio.pause();
+  modalAudio.currentTime = 0;
+  isAudioPlaying = false;
+  audioToggleBtn.textContent = '🔇';
 }
