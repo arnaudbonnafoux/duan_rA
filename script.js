@@ -1,3 +1,29 @@
+// =================== GESTION MODE SOMBRE ===================
+
+const themeToggle = document.getElementById('themeToggle');
+const htmlElement = document.documentElement;
+
+// Charger la préférence de thème
+const savedTheme = localStorage.getItem('theme') || 'light';
+if (savedTheme === 'dark') {
+  document.body.classList.add('dark-mode');
+  themeToggle.textContent = '☀️';
+}
+
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('theme', 'dark');
+    themeToggle.textContent = '☀️';
+  } else {
+    localStorage.setItem('theme', 'light');
+    themeToggle.textContent = '🌙';
+  }
+});
+
+// =================== LISTES DES IMAGES ===================
+
 // Liste des images - Galerie 1
 const images1 = [
   { src: 'images/visuel_1.webp', title: 'Alienus Omnium' },
@@ -58,8 +84,11 @@ function createGallery(containerEl, images) {
     wrapper.className = 'img-wrapper';
 
     const imageEl = document.createElement('img');
-    imageEl.src = img.src;
     imageEl.alt = img.title;
+    imageEl.loading = 'lazy';
+    // Utiliser data-src pour lazy loading manuel
+    imageEl.dataset.src = img.src;
+    imageEl.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3C/svg%3E';
 
     const title = document.createElement('p');
     title.className = 'gallery-title';
@@ -68,6 +97,18 @@ function createGallery(containerEl, images) {
     wrapper.appendChild(imageEl);
     item.appendChild(title);
     item.appendChild(wrapper);
+    
+    // Intersection Observer pour lazy loading
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          observer.unobserve(img);
+        }
+      });
+    });
+    imageObserver.observe(imageEl);
 
     // Ajouter une couche de protection invisible
     const protectionLayer = document.createElement('div');
