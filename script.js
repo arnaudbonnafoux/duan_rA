@@ -25,7 +25,7 @@ const images2 = [
   { src: 'images/visuel_29.webp', title: 'Consonantia Abstracta' },
   { src: 'images/visuel_30.webp', title: 'Dissonantia Harmoniosa' },
   { src: 'images/visuel_31.webp', title: 'Crescendo Visualis' },
-  { src: 'images/visuel_33.webp', title: 'Vertigines Coloratae' },
+  //{ src: 'images/visuel_33.webp', title: 'Vertigines Coloratae' },
   { src: 'images/visuel_34.webp', title: 'Resonantia Infinita' },
   { src: 'images/visuel_35.webp', title: 'Conclusio Somnialis' },
 ];
@@ -127,6 +127,7 @@ bioText.innerHTML = `
   <h2>De Artifice duan rA</h2>
   <p>Salute in domicilium digitale duan rA, artificis qui limites inter abstractum et concretum, inter ordinem et chaos investigat. Creationes eius, in galleriis "Viae Errantes" et "Revolutiones Formales" congregatae, quaestionem perpetuam pulchritudinis sine fine exprimunt, ubi unaquaeque opus fabulam formarum, colorum et motus narratur.</p>
   <p>Pulchritudo sine fine - ornamentum aeternum - est philosophia quae artem eius regit.</p>
+  <p><a href="https://www.instagram.com/projet_duanra/" target="_blank" rel="noopener noreferrer" aria-label="Compte Instagram de duan rA"><i class="fab fa-instagram"></i></a></p>
 `;
 
 bioContent.appendChild(bioCLoseBtn);
@@ -135,7 +136,11 @@ bioOverlay.appendChild(bioContent);
 document.body.appendChild(bioOverlay);
 
 // Événements modale bio
-bioBtn.addEventListener('click', () => openBioModal());
+if (bioBtn) {
+  bioBtn.addEventListener('click', () => openBioModal());
+} else {
+  console.warn('Le bouton bioBtn n\'a pas été trouvé');
+}
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && bioOverlay.style.display === 'flex') {

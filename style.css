@@ -374,6 +374,25 @@ a {
 
 .bio-text p:last-child {
   margin-bottom: 0;
+  text-align: center;
+}
+
+.bio-text a {
+  color: #fff;
+  font-size: 32px;
+  transition: transform 0.2s ease, color 0.2s ease;
+  display: inline-block;
+}
+
+.bio-text a:hover {
+  transform: scale(1.2);
+  color: #e1306c;
+}
+
+.bio-text a:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 @media (max-width: 768px) {
