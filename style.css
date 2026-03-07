@@ -752,7 +752,7 @@ body.dark-mode .page-container h1 {
   }
 
   .div_footer {
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
     text-align: center;
   }
