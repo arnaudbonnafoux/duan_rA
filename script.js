@@ -310,7 +310,8 @@ nextBtn.addEventListener('click', () => showNextImage());
 const audioPlaylist = [
   'audio/Life motion-second movement.mp3',
   'audio/The light of inside.mp3',
-  'audio/fantasme_faune.mp3'
+  'audio/fantasme_faune.mp3',
+  'audio/bats_attack.mp3'
 ];
 let currentAudioIndex = 0;
 
