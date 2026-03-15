@@ -36,6 +36,31 @@ body {
   padding: 0;
 }
 
+/* ============== ACCESSIBILITÉ - FOCUS VISIBLE ============== */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+body.dark-mode button:focus-visible,
+body.dark-mode a:focus-visible,
+body.dark-mode [role="button"]:focus-visible {
+  outline: 3px solid #87ceeb;
+  outline-offset: 2px;
+}
+
+/* Amélioration du contraste pour certains textes */
+a {
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
 /* ============== DARK MODE ============== */
 body.dark-mode {
   background: var(--color-dark-bg);

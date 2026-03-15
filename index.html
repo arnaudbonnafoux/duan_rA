@@ -7,16 +7,34 @@
     <meta name="description" content="Galerie d'art numérique - Découvrez les œuvres contemporaines d'art numérique de duan rA. Exposition 'Lignes d'Errance'.">
     <meta property="og:title" content="duan rA - Galerie d'Art Numérique">
     <meta property="og:description" content="Explorez la collection 'Lignes d'Errance' - une sélection d'œuvres d'art numérique contemporain.">
-    <meta property="og:image" content="images/visuel_9.webp">
+    <meta property="og:image" content="https://duanra.fr/images/visuel_9.webp">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://duanra.fr/">
     <meta name="theme-color" content="#340b5a">
+    <meta name="author" content="duan rA">
+    <link rel="canonical" href="https://duanra.fr/">
     <link rel="apple-touch-icon" sizes="180x180" href="images/favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="images/favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon_io/favicon-16x16.png">
     <link rel="manifest" href="images/favicon_io/site.webmanifest">
-    <title>duan rA</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <title>duan rA - Galerie d'Art Numérique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="style.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "duan rA",
+      "url": "https://duanra.fr",
+      "email": "projet.duanra@orange.fr",
+      "jobTitle": "Artiste Numérique",
+      "description": "Artiste créant des œuvres d'art numérique contemporain explorant la beauté sans fin",
+      "sameAs": ["https://www.instagram.com/projet_duanra/"],
+      "image": "https://duanra.fr/images/visuel_9.webp"
+    }
+    </script>
     <script src="script.js" defer></script>
 </head>
 
@@ -24,8 +42,8 @@
     <header>
         <div class="div_header">
         <div>
-            <img class="img_header" src="images/visuel_7.webp">
-            <button id="bioBtn" class="bio-button">À propos de l'artiste</button>
+            <img class="img_header" src="images/visuel_7.webp" alt="Spectra Lucis - Œuvre d'art numérique">
+            <button id="bioBtn" class="bio-button" aria-label="Ouvrir la biographie de l'artiste duan rA">À propos de l'artiste</button>
         </div>
         <div>
             <h1>duan rA</h1>
@@ -54,18 +72,20 @@
 
     <footer>
         <div class='div_footer'>
-            <a href="mailto:projet.duanra@orange.fr">
-                <img src="images/visuel_mail.webp" alt="Envoyer un e-mail" class='dimension_icones' />
+            <a href="mailto:projet.duanra@orange.fr" aria-label="Envoyer un email à duan rA">
+                <img src="images/visuel_mail.webp" alt="Icône email - Contacter par email" class='dimension_icones' />
             </a>
-            <a href="">
-                <img src="images/phone.webp" alt="Téléphone" class='dimension_icones' />
+            <a href="tel:+33" aria-label="Appeler par téléphone" title="Numéro de téléphone à fournir">
+                <img src="images/phone.webp" alt="Icône téléphone" class='dimension_icones' />
             </a>
-            <a href="" target="_blank" rel="noopener noreferrer">
-                <img src="images/location.webp" alt="Localisation" class='dimension_icones' />
+            <a href="#" aria-label="Localisation du studio" title="Localisation à fournir">
+                <img src="images/location.webp" alt="Icône localisation" class='dimension_icones' />
             </a>
         </div>
-        <a href="mentions_légales.html">Mentions légales</a>
-        <a href="cgu.html">Conditions d’utilisation</a>
+        <nav aria-label="Liens légaux et information">
+            <a href="mentions_légales.html">Mentions légales</a>
+            <a href="cgu.html">Conditions d'utilisation</a>
+        </nav>
     
         <p style="font-size: x-small; text-align: center; padding-bottom: 8px;">
             &copy; 2026 duan rA</p>

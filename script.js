@@ -16,10 +16,22 @@ themeToggle.addEventListener('click', () => {
   if (document.body.classList.contains('dark-mode')) {
     localStorage.setItem('theme', 'dark');
     themeToggle.textContent = '☀️';
+    themeToggle.setAttribute('aria-label', 'Activer le mode clair');
   } else {
     localStorage.setItem('theme', 'light');
     themeToggle.textContent = '🌙';
+    themeToggle.setAttribute('aria-label', 'Activer le mode sombre');
   }
+  // Annoncer le changement aux lecteurs d'écran
+  const announcement = document.body.classList.contains('dark-mode') ? 'Mode sombre activé' : 'Mode clair activé';
+  const ariaLive = document.createElement('div');
+  ariaLive.setAttribute('role', 'status');
+  ariaLive.setAttribute('aria-live', 'polite');
+  ariaLive.style.position = 'absolute';
+  ariaLive.style.left = '-10000px';
+  ariaLive.textContent = announcement;
+  document.body.appendChild(ariaLive);
+  setTimeout(() => ariaLive.remove(), 1000);
 });
 
 // =================== LISTES DES IMAGES ===================
@@ -319,16 +331,18 @@ modalAudio.addEventListener('ended', () => {
 const audioToggleBtn = document.createElement('button');
 audioToggleBtn.className = 'modal-audio-btn';
 audioToggleBtn.textContent = '🔊';
-audioToggleBtn.setAttribute('aria-label', 'Activer/désactiver le son');
+audioToggleBtn.setAttribute('aria-label', 'Muet - Cliquez pour couper le son');
 let isAudioPlaying = false;
 audioToggleBtn.addEventListener('click', () => {
   if (isAudioPlaying) {
     modalAudio.pause();
     audioToggleBtn.textContent = '🔇';
+    audioToggleBtn.setAttribute('aria-label', 'Son coupé - Cliquez pour activer le son');
     isAudioPlaying = false;
   } else {
     modalAudio.play();
     audioToggleBtn.textContent = '🔊';
+    audioToggleBtn.setAttribute('aria-label', 'Son actif - Cliquez pour couper le son');
     isAudioPlaying = true;
   }
 });
