@@ -294,12 +294,25 @@ nextBtn.textContent = '❯';
 nextBtn.setAttribute('aria-label', 'Image suivante');
 nextBtn.addEventListener('click', () => showNextImage());
 
+// Playlist audio
+const audioPlaylist = [
+  'audio/Life motion-second movement.mp3',
+  'audio/The light of inside.mp3'
+];
+let currentAudioIndex = 0;
+
 // Élément audio
 const modalAudio = document.createElement('audio');
 modalAudio.id = 'modal-audio';
-modalAudio.loop = true;
 modalAudio.preload = 'auto';
-modalAudio.src = 'audio/Life motion-second movement.mp3';
+modalAudio.src = audioPlaylist[currentAudioIndex];
+
+// Gestion de la fin d'un morceau - passer au suivant
+modalAudio.addEventListener('ended', () => {
+  currentAudioIndex = (currentAudioIndex + 1) % audioPlaylist.length;
+  modalAudio.src = audioPlaylist[currentAudioIndex];
+  modalAudio.play();
+});
 
 // Bouton de contrôle audio
 const audioToggleBtn = document.createElement('button');
