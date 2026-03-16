@@ -128,6 +128,9 @@ body.dark-mode .theme-toggle:hover {
 .img_header {
   border-radius: var(--border-radius);
   max-width: 150px;
+  user-select: none;
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .tagline {

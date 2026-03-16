@@ -1,3 +1,12 @@
+// =================== PROTECTION DE L'IMAGE HEADER ===================
+
+// Empêcher le téléchargement de l'image du header
+const headerImg = document.querySelector('.img_header');
+if (headerImg) {
+  headerImg.addEventListener('contextmenu', (e) => e.preventDefault());
+  headerImg.addEventListener('dragstart', (e) => e.preventDefault());
+}
+
 // =================== GESTION MODE SOMBRE ===================
 
 const themeToggle = document.getElementById('themeToggle');
