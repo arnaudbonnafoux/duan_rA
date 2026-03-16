@@ -776,6 +776,10 @@ body.dark-mode .page-container h1 {
     line-height: 1.5;
   }
 
+  footer {
+    max-width: 95%;
+  }
+
   .div_footer {
     flex-direction: row;
     gap: 10px;
