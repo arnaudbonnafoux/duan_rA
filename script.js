@@ -148,6 +148,18 @@ function createGallery(containerEl, images) {
       return false;
     });
 
+    // Bloquer le clic droit sur la couche de protection
+    protectionLayer.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
+    // Bloquer le drag-drop sur la couche de protection
+    protectionLayer.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
     // Modale au clic ou Entrée/Espace
     item.addEventListener('click', () => openModal(index));
     item.addEventListener('keydown', (e) => {
@@ -294,6 +306,18 @@ modalImageWrapper.className = 'modal-image-wrapper';
 // Créer la couche invisible de protection
 const modalImageProtection = document.createElement('div');
 modalImageProtection.className = 'modal-image-protection';
+
+// Bloquer le clic droit sur la couche de protection modale
+modalImageProtection.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  return false;
+});
+
+// Bloquer le drag-drop sur la couche de protection modale
+modalImageProtection.addEventListener('dragstart', (e) => {
+  e.preventDefault();
+  return false;
+});
 
 // Titre + compteur
 const modalInfoContainer = document.createElement('div');
