@@ -180,7 +180,7 @@ bioText.innerHTML = `
   <h2>De Artifice duan rA</h2>
   <p>Salute in domicilium digitale duan rA, artificis qui limites inter abstractum et concretum, inter ordinem et chaos investigat. Creationes eius, in galleriis "Viae Errantes" et "Revolutiones Formales" congregatae, quaestionem perpetuam pulchritudinis sine fine exprimunt, ubi unaquaeque opus fabulam formarum, colorum et motus narratur.</p>
   <p>Pulchritudo sine fine - ornamentum aeternum - est philosophia quae artem eius regit.</p>
-  <p><a href="https://www.instagram.com/projet_duanra/" target="_blank" rel="noopener noreferrer" aria-label="Compte Instagram de duan rA"><i class="fab fa-instagram"></i></a><span style="display: inline-block; width: 20px;"></span><a href="https://github.com/arnaudbonnafoux" target="_blank" rel="noopener noreferrer" aria-label="GitHub d'Arnaud Bonnafoux"><i class="fas fa-music"></i></a></p>
+  <p><a href="https://www.instagram.com/projet_duanra/" target="_blank" rel="noopener noreferrer" aria-label="Compte Instagram de duan rA"><i class="fab fa-instagram"></i></a><span style="display: inline-block; width: 20px;"></span><a href="https://arnaudbonnafoux.github.io/" target="_blank" rel="noopener noreferrer" aria-label="Portfolio d'Arnaud Bonnafoux"><i class="fas fa-music"></i></a></p>
 `;
 
 bioContent.appendChild(bioCLoseBtn);
