@@ -347,7 +347,7 @@ const audioPlaylist = [
   'audio/Ritual song for your cat.mp3',
   'audio/fantasme_faune.mp3',
   'audio/bats_attack.mp3',
-  'audio/Confinement_part2.mp3',
+  'audio/Confinement_part 2.mp3',
   'audio/passions_infâmes.mp3'
 ];
 let currentAudioIndex = 0;
