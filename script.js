@@ -343,12 +343,6 @@ nextBtn.addEventListener('click', () => showNextImage());
 const audioPlaylist = [
   'audio/Life motion-second movement.mp3',
   'audio/The light of inside.mp3'
-  /*"audio/spirale_de_l'infini.mp3",
-  'audio/Ritual song for your cat.mp3',
-  'audio/fantasme_faune.mp3',
-  'audio/bats_attack.mp3',
-  'audio/Confinement_part 2.mp3',
-  'audio/passions_infâmes.mp3'*/
 ];
 let currentAudioIndex = 0;
 
