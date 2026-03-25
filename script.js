@@ -342,7 +342,8 @@ nextBtn.addEventListener('click', () => showNextImage());
 // Playlist audio
 const audioPlaylist = [
   'audio/Life motion-second movement.mp3',
-  'audio/The light of inside.mp3'
+  'audio/The light of inside.mp3',
+  'audio/Life motion-first movement.mp3'
 ];
 let currentAudioIndex = 0;
 
