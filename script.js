@@ -341,7 +341,7 @@ nextBtn.addEventListener('click', () => showNextImage());
 
 // Playlist audio
 const audioPlaylist = [
-  'audio/respiratio_vacui_stream_tagged.mp3'
+  'audio/respiratio_vacui_v2.mp3'
 ];
 let currentAudioIndex = 0;
 
