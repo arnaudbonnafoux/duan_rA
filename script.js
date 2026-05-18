@@ -69,7 +69,7 @@ const images2 = [
   { src: 'images/visuel_26.webp', title: 'Murmura Chromatica' },
   { src: 'images/visuel_27.webp', title: 'Symphonia Tacita' },
   { src: 'images/visuel_28.webp', title: 'Vibratio Chromatica' },
-  { src: 'images/visuel_29.webp', title: 'Consonantia Abstracta' },
+  { src: 'images/visuel_29.webp', title: 'Vertigo Abyssi' },
   { src: 'images/visuel_30.webp', title: 'Dissonantia Harmoniosa' },
   { src: 'images/visuel_31.webp', title: 'Crescendo Visualis' },
   //{ src: 'images/visuel_33.webp', title: 'Vertigines Coloratae' },
