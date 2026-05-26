@@ -75,6 +75,9 @@ const images2 = [
   //{ src: 'images/visuel_33.webp', title: 'Vertigines Coloratae' },
   { src: 'images/visuel_34.webp', title: 'Resonantia Infinita' },
   { src: 'images/visuel_35.webp', title: 'Conclusio Somnialis' },
+  { src: 'images/visuel_36.webp', title: 'Fluxus Modularis' },
+  { src: 'images/visuel_37.webp', title: 'Geometria Chromatica' },
+  { src: 'images/visuel_38.webp', title: 'Nexus Formalis' },
 ];
 
 let currentGallery = 'gallery1';
