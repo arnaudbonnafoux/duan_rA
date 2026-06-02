@@ -1,6 +1,7 @@
 images/*.sh
 audio/*.sh
 IMAGE_INTEGRATION_LOG.md
-installation_audiovisuelle_générative.mdTECHNICAL_DOCUMENTATION.md
+installation_audiovisuelle_générative.md
+TECHNICAL_DOCUMENTATION.md
 cyclops_sonoris_recording.webm
 *.webm

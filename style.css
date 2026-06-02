@@ -964,9 +964,9 @@ body.dark-mode .page-container h1 {
   position: absolute;
   top: 15px;
   right: 15px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  border: 2px solid rgba(255, 255, 255, 1);
   font-size: 28px;
   width: 40px;
   height: 40px;
@@ -976,11 +976,15 @@ body.dark-mode .page-container h1 {
   align-items: center;
   justify-content: center;
   z-index: 1001;
-  transition: background-color var(--transition);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
 }
 
 .installation-close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transform: scale(1.1);
 }
 
 .installation-close-btn:focus-visible {
