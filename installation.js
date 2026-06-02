@@ -50,7 +50,7 @@ class AudiovisualInstallation {
       // Créer une reverb avec des delays et feedback
       this.dryGain = this.audioContext.createGain();
       this.wetGain = this.audioContext.createGain();
-      this.wetGain.gain.value = 0.65; // Augmenté de 0.45 à 0.65 pour bien plus de reverb
+      this.wetGain.gain.value = 0.55; // Baissé de 0.65 à 0.55 pour éviter saturation
       
       // Créer plusieurs delays pour simuler une reverb
       const delayTimes = [0.05, 0.1, 0.15, 0.25]; // Ajout d'un délai supplémentaire
@@ -62,8 +62,8 @@ class AudiovisualInstallation {
         const delayGain = this.audioContext.createGain();
         
         delayNode.delayTime.value = time;
-        feedbackGain.gain.value = 0.70; // Augmenté de 0.55 à 0.70 pour très forte résonance
-        delayGain.gain.value = 0.80; // Augmenté de 0.6 à 0.80
+        feedbackGain.gain.value = 0.60; // Baissé de 0.70 à 0.60 pour réduire saturation
+        delayGain.gain.value = 0.70; // Baissé de 0.80 à 0.70
         
         this.filter.connect(delayNode);
         delayNode.connect(feedbackGain);
