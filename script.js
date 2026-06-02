@@ -460,3 +460,55 @@ function closeModal() {
   isAudioPlaying = false;
   audioToggleBtn.textContent = '🔇';
 }
+
+// =================== INSTALLATION AUDIOVISUELLE ===================
+
+const tabInstallation = document.getElementById('tabInstallation');
+const installationOverlay = document.getElementById('installationOverlay');
+const installationCloseBtn = document.getElementById('installationCloseBtn');
+const installationCanvas = document.getElementById('installationCanvas');
+
+if (tabInstallation) {
+  tabInstallation.addEventListener('click', () => {
+    openInstallationModal();
+  });
+}
+
+if (installationCloseBtn) {
+  installationCloseBtn.addEventListener('click', () => {
+    closeInstallationModal();
+  });
+}
+
+// Fermer avec Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && installationOverlay && installationOverlay.style.display === 'flex') {
+    closeInstallationModal();
+  }
+});
+
+// Fermer en cliquant sur le fond
+if (installationOverlay) {
+  installationOverlay.addEventListener('click', (e) => {
+    if (e.target === installationOverlay) {
+      closeInstallationModal();
+    }
+  });
+}
+
+function openInstallationModal() {
+  if (installationOverlay) {
+    installationOverlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    if (installationCloseBtn) {
+      installationCloseBtn.focus();
+    }
+  }
+}
+
+function closeInstallationModal() {
+  if (installationOverlay) {
+    installationOverlay.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+}

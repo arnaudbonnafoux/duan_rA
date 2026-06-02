@@ -921,3 +921,69 @@ body.dark-mode .page-container h1 {
     margin-bottom: 10px;
   }
 }
+
+/* ============== INSTALLATION AUDIOVISUELLE ============== */
+
+.installation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.installation-overlay.hidden {
+  display: none;
+}
+
+.installation-content {
+  position: relative;
+  width: 90%;
+  max-width: 900px;
+  height: 80vh;
+  max-height: 700px;
+  background: var(--color-bg-light);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.installation-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.installation-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  font-size: 28px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  transition: background-color var(--transition);
+}
+
+.installation-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.installation-close-btn:focus-visible {
+  outline: 2px solid #87ceeb;
+  outline-offset: 2px;
+}

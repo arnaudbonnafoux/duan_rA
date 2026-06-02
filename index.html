@@ -36,6 +36,7 @@
     }
     </script>
     <script src="script.js" defer></script>
+    <script src="installation.js" defer></script>
 </head>
 
 <body>
@@ -57,9 +58,10 @@
 
     <h2 id="galleryTitle">Galerie "Viae Errantes"</h2>
 
-    <!-- Onglet pour galerie 2 -->
+    <!-- Onglets pour galeries et installation -->
     <div class="tabs-container">
         <button class="tab-button" id="tabGallery2">Galerie Revolutiones Formales</button>
+        <button class="tab-button" id="tabInstallation">Installation Audiovisuelle</button>
     </div>
 
     <!-- Galerie 1 (par défaut) -->
@@ -68,7 +70,13 @@
     <!-- Galerie 2 (cachée) -->
     <div id="gallery2" class="gallery-container hidden" role="main" style="display:none;"></div>
 
-    <!-- Modale sera générée par le JS -->
+    <!-- Installation Audiovisuelle (modale) -->
+    <div id="installationOverlay" class="installation-overlay hidden" role="dialog" aria-label="Installation audiovisuelle générative" style="display:none;">
+        <div class="installation-content">
+            <button id="installationCloseBtn" class="installation-close-btn" aria-label="Fermer l'installation">&times;</button>
+            <canvas id="installationCanvas" class="installation-canvas" width="800" height="600" role="img" aria-label="Installation audiovisuelle générative"></canvas>
+        </div>
+    </div>
 
     <footer>
         <div class='div_footer'>
