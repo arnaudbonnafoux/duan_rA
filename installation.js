@@ -325,6 +325,46 @@ class AudiovisualInstallation {
     }
     this.stopAudio();
   }
+  
+  startRecording() {
+    const stream = this.canvas.captureStream(60); // 60 FPS
+    const options = { 
+      audioBitsPerSecond: 128000,
+      videoBitsPerSecond: 2500000,
+      mimeType: 'video/webm;codecs=vp8,opus'
+    };
+    
+    this.mediaRecorder = new MediaRecorder(stream, options);
+    this.chunks = [];
+    
+    this.mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        this.chunks.push(e.data);
+      }
+    };
+    
+    this.mediaRecorder.onstop = () => {
+      const blob = new Blob(this.chunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cyclops_sonoris_recording.webm';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+    
+    this.mediaRecorder.start();
+    console.log('Enregistrement démarré');
+  }
+  
+  stopRecording() {
+    if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+      this.mediaRecorder.stop();
+      console.log('Enregistrement arrêté et téléchargement');
+    }
+  }
 }
 
 // Exposer la classe globalement
@@ -352,6 +392,22 @@ window.AudiovisualInstallation = AudiovisualInstallation;
       installation.stop();
       installation = null;
       console.log('Installation arrêtée');
+    }
+  };
+  
+  window.startCyclopsRecording = function() {
+    if (installation) {
+      installation.startRecording();
+    } else {
+      console.warn('Installation non active');
+    }
+  };
+  
+  window.stopCyclopsRecording = function() {
+    if (installation) {
+      installation.stopRecording();
+    } else {
+      console.warn('Installation non active');
     }
   };
 
