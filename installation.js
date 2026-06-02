@@ -327,14 +327,30 @@ class AudiovisualInstallation {
   }
   
   startRecording() {
-    const stream = this.canvas.captureStream(60); // 60 FPS
+    // Capturer le canvas (vidéo)
+    const videoStream = this.canvas.captureStream(60); // 60 FPS
+    
+    // Capturer l'audio Web Audio API
+    const audioDestination = this.audioContext.createMediaStreamDestination();
+    
+    // Router l'audio vers la destination de streaming
+    // dryGain et wetGain sont déjà connectés à audioContext.destination
+    // On peut les connecter AUSSI vers la destination de streaming
+    this.dryGain.connect(audioDestination);
+    this.wetGain.connect(audioDestination);
+    
+    // Ajouter la piste audio au stream vidéo
+    audioDestination.stream.getAudioTracks().forEach(track => {
+      videoStream.addTrack(track);
+    });
+    
     const options = { 
-      audioBitsPerSecond: 128000,
-      videoBitsPerSecond: 2500000,
+      audioBitsPerSecond: 192000,
+      videoBitsPerSecond: 3000000,
       mimeType: 'video/webm;codecs=vp8,opus'
     };
     
-    this.mediaRecorder = new MediaRecorder(stream, options);
+    this.mediaRecorder = new MediaRecorder(videoStream, options);
     this.chunks = [];
     
     this.mediaRecorder.ondataavailable = (e) => {
@@ -356,7 +372,7 @@ class AudiovisualInstallation {
     };
     
     this.mediaRecorder.start();
-    console.log('Enregistrement démarré');
+    console.log('Enregistrement démarré (vidéo + audio)');
   }
   
   stopRecording() {
