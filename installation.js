@@ -326,6 +326,12 @@ class AudiovisualInstallation {
     this.stopAudio();
   }
   
+  // =================== ENREGISTREMENT (DÉSACTIVÉ) ===================
+  // Les fonctionnalités d'enregistrement sont volontairement désactivées
+  // pour empêcher les visiteurs de capturer l'installation.
+  // Le code est conservé commenté pour une éventuelle réactivation future.
+  
+  /*
   startRecording() {
     // Capturer le canvas (vidéo)
     const videoStream = this.canvas.captureStream(60); // 60 FPS
@@ -381,6 +387,7 @@ class AudiovisualInstallation {
       console.log('Enregistrement arrêté et téléchargement');
     }
   }
+  */
 }
 
 // Exposer la classe globalement
@@ -411,6 +418,11 @@ window.AudiovisualInstallation = AudiovisualInstallation;
     }
   };
   
+  // =================== ENREGISTREMENT (DÉSACTIVÉ) ===================
+  // Les fonctionnalités d'enregistrement sont volontairement désactivées
+  // pour empêcher les visiteurs de capturer l'installation.
+  
+  /*
   window.startCyclopsRecording = function() {
     if (installation) {
       installation.startRecording();
@@ -426,6 +438,7 @@ window.AudiovisualInstallation = AudiovisualInstallation;
       console.warn('Installation non active');
     }
   };
+  */
 
   // Attendre que le DOM soit prêt
   function setupListeners() {
