@@ -201,9 +201,13 @@ bioCLoseBtn.addEventListener('click', () => closeBioModal());
 const bioText = document.createElement('div');
 bioText.className = 'bio-text';
 bioText.innerHTML = `
-  <h2>De Artifice duan rA</h2>
-  <p>Salute in domicilium digitale duan rA, artificis qui limites inter abstractum et concretum, inter ordinem et chaos investigat. Creationes eius, in galleriis "Viae Errantes" et "Revolutiones Formales" congregatae, quaestionem perpetuam pulchritudinis sine fine exprimunt, ubi unaquaeque opus fabulam formarum, colorum et motus narratur.</p>
-  <p>Pulchritudo sine fine - ornamentum aeternum - est philosophia quae artem eius regit.</p>
+  <h2>Le projet duan rA</h2>
+  <p>duan rA est un projet qui regroupe plusieurs pratiques artistiques comme la musique, les arts visuels et le développement web.</p>
+  <p>Ce site "vitrine" propose plusieurs galeries de visuels illustrant les albums, EPs et "singles" produits par les musiciens du projet.</p>
+  <p>En outre, ce site est lui même un objet de création artistique comprenant des installations web associées à de la synthèse sonore.</p>
+  <p>Le projet est né en 2025 ; il est donc destiné à évoluer très prochainement en fonction des aléas de la création elle-même et des rencontres entre artistes qu'elle pourrait provoquer.</p>
+  <p>L'esthétique du projet repose sur une idée simple : rendre visible et audible, par l'expérimentation, l'invisible — ces dimensions cachées qui nous entourent mais échappent à la perception.</p>
+  <p>L'intuition et l'introspection sont convoquées pour explorer cette dimension primordiale et créer un ailleurs où l'imagination pose, avec authenticité, les fondements du vide et l'expression de son potentiel infini dans la création artistique.</p>
   <p><a href="https://www.instagram.com/projet_duanra/" target="_blank" rel="noopener noreferrer" aria-label="Compte Instagram de duan rA"><i class="fab fa-instagram"></i></a><span style="display: inline-block; width: 20px;"></span><a href="https://arnaudbonnafoux.github.io/" target="_blank" rel="noopener noreferrer" aria-label="Portfolio d'Arnaud Bonnafoux"><i class="fas fa-music"></i></a></p>
 `;
 
