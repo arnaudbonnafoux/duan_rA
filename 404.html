@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Page non trouvée - duan rA">
+    <title>404 - Page non trouvée - duan rA</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            text-align: center;
+            padding: 20px;
+        }
+        .error-container h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        .error-container p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .error-container a {
+            padding: 12px 24px;
+            background-color: rgba(52, 11, 90, 0.2);
+            color: var(--color-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .error-container a:hover {
+            background-color: rgba(52, 11, 90, 0.4);
+        }
+        body.dark-mode .error-container a {
+            color: #87ceeb;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="div_header">
+            <div>
+                <h1>duan rA</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="error-container">
+        <h1>404</h1>
+        <p>Oops ! La page que tu cherches a disparu dans les dimensions invisibles...</p>
+        <p>Cette page n'existe pas ou a été déplacée.</p>
+        <a href="/">← Retour à l'accueil</a>
+    </div>
+
+    <footer>
+        <div class='div_footer'>
+            <a href="mailto:projet.duanra@orange.fr" aria-label="Envoyer un email à duan rA">
+                <img src="images/visuel_mail.webp" alt="Icône email - Contacter par email" class='dimension_icones' />
+            </a>
+            <a href="#" aria-label="Appeler par téléphone" title="Numéro de téléphone à fournir">
+                <img src="images/phone.webp" alt="Icône téléphone" class='dimension_icones' />
+            </a>
+            <a href="#" aria-label="Localisation du studio" title="Localisation à fournir">
+                <img src="images/location.webp" alt="Icône localisation" class='dimension_icones' />
+            </a>
+        </div>
+        <nav aria-label="Liens légaux et information">
+            <a href="mentions_légales.html">Mentions légales</a>
+            <a href="cgu.html">Conditions d'utilisation</a>
+        </nav>
+        <p style="font-size: x-small; text-align: center; padding-bottom: 8px;">
+            &copy; 2026 duan rA</p>
+    </footer>
+
+    <script>
+        // Charger le thème sauvegardé
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>
