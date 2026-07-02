@@ -17,8 +17,21 @@
   Cache-Control: public, max-age=31536000, immutable
   Content-Type: application/javascript
 
+/installation.js
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: application/javascript
+
+/404.html
+  Cache-Control: public, max-age=3600, must-revalidate
+
 /audio/*
   Cache-Control: public, max-age=31536000, immutable
+  Content-Type: audio/mpeg
 
-/images/*
+/images/*.webp
   Cache-Control: public, max-age=31536000, immutable
+  Content-Type: image/webp
+
+/images/*.png
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: image/png
