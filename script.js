@@ -109,30 +109,12 @@ function createGallery(containerEl, images) {
 
     const imageEl = document.createElement('img');
     imageEl.alt = img.title;
+    imageEl.loading = 'lazy';
     imageEl.width = 1920;
     imageEl.height = 1920;
-    
-    // Lazy-load seulement les images hors écran (au-delà de la 4ème)
-    if (index < 4) {
-      // Charger directement les premières images visibles
-      imageEl.src = img.src;
-    } else {
-      // Lazy-load pour les images suivantes
-      imageEl.dataset.src = img.src;
-      imageEl.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3C/svg%3E';
-      
-      // Intersection Observer pour lazy loading
-      const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = entry.target;
-            img.src = img.dataset.src;
-            observer.unobserve(img);
-          }
-        });
-      });
-      imageObserver.observe(imageEl);
-    }
+    // Utiliser data-src pour lazy loading manuel
+    imageEl.dataset.src = img.src;
+    imageEl.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3C/svg%3E';
 
     const title = document.createElement('p');
     title.className = 'gallery-title';
@@ -142,6 +124,18 @@ function createGallery(containerEl, images) {
     item.appendChild(title);
     item.appendChild(wrapper);
     
+    // Intersection Observer pour lazy loading
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          observer.unobserve(img);
+        }
+      });
+    });
+    imageObserver.observe(imageEl);
+
     // Ajouter une couche de protection invisible
     const protectionLayer = document.createElement('div');
     protectionLayer.className = 'image-protection';
