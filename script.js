@@ -480,6 +480,11 @@ if (tabInstallation) {
   });
 }
 
+// EXHIBITION MODE - Aucun contrôle de fermeture pour l'installation Cyclops Sonoris
+// Le bouton de fermeture est caché en CSS (display: none)
+// Les méthodes de fermeture (Escape, clic fond) sont désactivées
+
+/*
 if (installationCloseBtn) {
   installationCloseBtn.addEventListener('click', () => {
     closeInstallationModal();
@@ -501,14 +506,13 @@ if (installationOverlay) {
     }
   });
 }
+*/
 
 function openInstallationModal() {
   if (installationOverlay) {
     installationOverlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    if (installationCloseBtn) {
-      installationCloseBtn.focus();
-    }
+    // Focus retiré pour mode exposition (pas de croix de fermeture)
   }
 }
 

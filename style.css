@@ -923,7 +923,7 @@ body.dark-mode .page-container h1 {
   }
 }
 
-/* ============== INSTALLATION AUDIOVISUELLE ============== */
+/* ============== INSTALLATION AUDIOVISUELLE - MODE EXPOSITION FULLSCREEN ============== */
 
 .installation-overlay {
   position: fixed;
@@ -931,12 +931,12 @@ body.dark-mode .page-container h1 {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
+  backdrop-filter: none;
 }
 
 .installation-overlay.hidden {
@@ -945,13 +945,11 @@ body.dark-mode .page-container h1 {
 
 .installation-content {
   position: relative;
-  width: 90%;
-  max-width: 900px;
-  height: 80vh;
-  max-height: 700px;
-  background: var(--color-bg-light);
-  border-radius: var(--border-radius);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background: #000;
+  border-radius: 0;
+  box-shadow: none;
   overflow: hidden;
 }
 
@@ -962,24 +960,7 @@ body.dark-mode .page-container h1 {
 }
 
 .installation-close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  border: 2px solid rgba(255, 255, 255, 1);
-  font-size: 28px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1001;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  font-weight: bold;
+  display: none;
 }
 
 .installation-close-btn:hover {
