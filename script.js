@@ -110,6 +110,8 @@ function createGallery(containerEl, images) {
     const imageEl = document.createElement('img');
     imageEl.alt = img.title;
     imageEl.loading = 'lazy';
+    imageEl.width = 1920;
+    imageEl.height = 1920;
     // Utiliser data-src pour lazy loading manuel
     imageEl.dataset.src = img.src;
     imageEl.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3C/svg%3E';
