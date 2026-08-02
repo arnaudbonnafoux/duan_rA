@@ -21,6 +21,9 @@ class AudiovisualInstallation {
     // Initialiser Web Audio API
     this.initAudio();
     
+    // Initialiser système de texte poétique
+    this.setupText();
+    
     // Initialiser animation
     this.particles = this.createParticles(30); // Augmenté de 15 à 30
     this.trails = this.particles.map(() => []); // Tracer les positions passées
@@ -104,29 +107,6 @@ class AudiovisualInstallation {
       this.lfo.frequency.value = 0.08; // Modulation très lente
       this.lfoGain.gain.value = 0.10; // Force de la modulation réduite
       this.lfo.connect(this.lfoGain);
-      
-      // Créer un bruit blanc pour plus de texture
-      const bufferSize = this.audioContext.sampleRate * 0.5;
-      const noiseBuffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
-      const noiseData = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        noiseData[i] = Math.random() * 2 - 1;
-      }
-      
-      this.noiseSource = this.audioContext.createBufferSource();
-      this.noiseSource.buffer = noiseBuffer;
-      this.noiseSource.loop = true;
-      this.noiseGain = this.audioContext.createGain();
-      this.noiseGain.gain.value = 0.02; // Bruit faible
-      
-      const noiseFilter = this.audioContext.createBiquadFilter();
-      noiseFilter.type = 'highpass';
-      noiseFilter.frequency.value = 200;
-      
-      this.noiseSource.connect(this.noiseGain);
-      this.noiseGain.connect(noiseFilter);
-      noiseFilter.connect(this.filter);
-      this.noiseSource.start();
       
       // Créer un master gain pour le fade-in au démarrage
       this.masterGain = this.audioContext.createGain();
@@ -244,12 +224,11 @@ class AudiovisualInstallation {
         }
       });
       
-      // Arrêter le LFO et le bruit
+      // Arrêter le LFO
       try {
         this.lfo.stop();
-        this.noiseSource.stop();
       } catch (e) {
-        // Déjà arrêtés
+        // Déjà arrêté
       }
       
       this.audioActive = false;
@@ -361,12 +340,108 @@ class AudiovisualInstallation {
     });
   }
   
+  // =================== SYSTÈME DE RÉVÉLATION DU TEXTE ===================
+  
+  setupText() {
+    this.textState = {
+      // Les 5 phrases poétiques de l'installation
+      phrases: [
+        "Le Cyclope n'est pas tué.",
+        "Son œil n'est plus.",
+        "Sa vision devient résonance.",
+        "Le centre disparaît.",
+        "Le multiple révèle la conscience."
+      ],
+      
+      // Timing : 15 secondes d'affichage total
+      displayDuration: 900,   // 15 secondes (900 frames à 60fps)
+      initialDelayFrames: 360,  // Délai initial de 6 secondes avant affichage
+      
+      // État courant
+      frameCounter: 0,
+      isDisplaying: false,
+      isComplete: false
+    };
+  }
+  
+  updateText() {
+    if (!this.textState) return;
+    
+    const ts = this.textState;
+    ts.frameCounter++;
+    
+    // Vérifier si on est dans la phase de délai initial
+    if (ts.frameCounter < ts.initialDelayFrames) {
+      ts.isDisplaying = false;
+      return;
+    }
+    
+    // Vérifier si on est dans la plage d'affichage
+    const framesSinceDelay = ts.frameCounter - ts.initialDelayFrames;
+    if (framesSinceDelay < ts.displayDuration) {
+      ts.isDisplaying = true;
+    } else {
+      ts.isDisplaying = false;
+      ts.isComplete = true;
+    }
+  }
+  
+  drawText() {
+    if (!this.textState) return;
+    
+    const ts = this.textState;
+    
+    // Vérifier si le texte est hors plage ou complet
+    if (ts.frameCounter < ts.initialDelayFrames) return;
+    const framesSinceDelay = ts.frameCounter - ts.initialDelayFrames;
+    if (framesSinceDelay > ts.displayDuration) return; // Texte disparu
+    
+    this.ctx.save();
+    
+    // Calculer l'opacité (fade out les 3 dernières secondes : 180 frames)
+    const fadeOutStart = ts.displayDuration - 180; // 27 sec
+    let opacity = 1;
+    if (framesSinceDelay > fadeOutStart) {
+      const fadeProgress = (framesSinceDelay - fadeOutStart) / 180;
+      opacity = Math.max(0, 1 - fadeProgress);
+    }
+    
+    // Configuration du texte
+    const fontSize = Math.min(48, this.width / 20);
+    this.ctx.font = `bold ${fontSize}px Georgia, serif`;
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    
+    // Afficher au centre avec espacement vertical
+    const centerX = this.width / 2;
+    const centerY = this.height / 2;
+    const lineSpacing = fontSize * 1.6;
+    const startY = centerY - (lineSpacing * 2); // Commencer 2 lignes avant le centre
+    
+    // Afficher les 5 phrases empilées verticalement
+    ts.phrases.forEach((phrase, index) => {
+      const yPos = startY + (index * lineSpacing);
+      
+      // Ombre pour lisibilité
+      this.ctx.fillStyle = `rgba(0, 0, 0, ${0.7 * opacity})`;
+      this.ctx.fillText(phrase, centerX + 2, yPos + 2);
+      
+      // Texte principal blanc avec opacité variable
+      this.ctx.fillStyle = `rgba(255, 255, 255, ${0.95 * opacity})`;
+      this.ctx.fillText(phrase, centerX, yPos);
+    });
+    
+    this.ctx.restore();
+  }
+  
   animate = () => {
     this.state.time++;
     
     this.updateAudio();
     this.updateParticles();
+    this.updateText();
     this.draw();
+    this.drawText();
     
     this.animationId = requestAnimationFrame(this.animate);
   }
