@@ -5,8 +5,10 @@ class AudiovisualInstallation {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    this.width = canvas.width;
-    this.height = canvas.height;
+    
+    // Redimensionner le canvas au fullscreen
+    this.resizeCanvas();
+    window.addEventListener('resize', () => this.resizeCanvas());
     
     // État partagé pour lier audio et visuels
     this.state = {
@@ -28,29 +30,48 @@ class AudiovisualInstallation {
     this.start();
   }
   
+  // =================== REDIMENSIONNEMENT RESPONSIF ===================
+  
+  resizeCanvas() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
+  }
+  
   // =================== WEB AUDIO API ===================
   
   initAudio() {
     try {
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
       
-      // Créer 3 oscillateurs pour le "drone" avec des types différents
-      const baseFreq = 55; // Fréquence grave de base
-      const waveTypes = ['sine', 'sawtooth', 'triangle'];
+      // Créer 5 oscillateurs avec fréquences basées sur le nombre d'or (φ)
+      const baseFreq = 75; // Fréquence de base
+      const phi = (1 + Math.sqrt(5)) / 2; // Nombre d'or ≈ 1.618
+      const waveTypes = ['sine', 'sawtooth', 'sawtooth', 'triangle', 'triangle'];
       
       this.oscillators = [];
       this.gains = [];
       
+      // Fréquences calculées: 95 × φ^(2i)
+      const frequencies = [
+        baseFreq,                              // 95 Hz
+        baseFreq * Math.pow(phi, 2),           // 248.7 Hz
+        baseFreq * Math.pow(phi, 4),           // 651.1 Hz
+        baseFreq * Math.pow(phi, 6) * 0.80,    // 1363.8 Hz
+        baseFreq * Math.pow(phi, 8) * 0.85     // 3793.5 Hz
+      ];
+      
       // Créer un filtre lowpass pour moduler le timbre
       this.filter = this.audioContext.createBiquadFilter();
       this.filter.type = 'lowpass';
-      this.filter.frequency.value = 1000; // Fréquence de coupure initiale
+      this.filter.frequency.value = 1200; // Fréquence de coupure augmentée (moins grave)
       this.filter.Q.value = 1;
       
       // Créer une reverb avec des delays et feedback
       this.dryGain = this.audioContext.createGain();
       this.wetGain = this.audioContext.createGain();
-      this.wetGain.gain.value = 0.55; // Baissé de 0.65 à 0.55 pour éviter saturation
+      this.wetGain.gain.value = 0.35; // Reverb réduit pour éviter saturation
       
       // Créer plusieurs delays pour simuler une reverb
       const delayTimes = [0.05, 0.1, 0.15, 0.25]; // Ajout d'un délai supplémentaire
@@ -62,8 +83,8 @@ class AudiovisualInstallation {
         const delayGain = this.audioContext.createGain();
         
         delayNode.delayTime.value = time;
-        feedbackGain.gain.value = 0.60; // Baissé de 0.70 à 0.60 pour réduire saturation
-        delayGain.gain.value = 0.70; // Baissé de 0.80 à 0.70
+        feedbackGain.gain.value = 0.40; // Feedback réduit pour moins de saturation
+        delayGain.gain.value = 0.55; // Delay gain réduit
         
         this.filter.connect(delayNode);
         delayNode.connect(feedbackGain);
@@ -80,8 +101,8 @@ class AudiovisualInstallation {
       // Créer un LFO (Low Frequency Oscillator) pour moduler l'amplitude
       this.lfo = this.audioContext.createOscillator();
       this.lfoGain = this.audioContext.createGain();
-      this.lfo.frequency.value = 0.1; // Modulation très lente (réduit de 0.3 à 0.1)
-      this.lfoGain.gain.value = 0.15; // Force de la modulation
+      this.lfo.frequency.value = 0.08; // Modulation très lente
+      this.lfoGain.gain.value = 0.10; // Force de la modulation réduite
       this.lfo.connect(this.lfoGain);
       
       // Créer un bruit blanc pour plus de texture
@@ -107,17 +128,22 @@ class AudiovisualInstallation {
       noiseFilter.connect(this.filter);
       this.noiseSource.start();
       
-      for (let i = 0; i < 3; i++) {
+      // Créer un master gain pour le fade-in au démarrage
+      this.masterGain = this.audioContext.createGain();
+      this.masterGain.gain.value = 0; // Commence à 0
+      this.fadeInStartTime = null;
+      
+      for (let i = 0; i < 5; i++) {
         const osc = this.audioContext.createOscillator();
         const gain = this.audioContext.createGain();
         
         // Varier les types d'ondes
         osc.type = waveTypes[i];
-        osc.frequency.value = baseFreq * (i + 1); // 55, 110, 165 Hz
+        osc.frequency.value = frequencies[i];
         
-        // Volume légèrement plus faible pour les ondes complexes
-        const volumeFactor = i === 0 ? 0.1 : 0.08;
-        gain.gain.value = volumeFactor;
+        // Gains progressifs mais réduits pour éviter saturation
+        const targetGains = [0.05, 0.06, 0.10, 0.12, 0.15];
+        gain.gain.value = targetGains[i];
         
         osc.connect(gain);
         gain.connect(this.filter);
@@ -132,9 +158,10 @@ class AudiovisualInstallation {
       }
       this.lfo.start();
       
-      // Connecter le filtre à la sortie (dry + wet)
-      this.dryGain.connect(this.audioContext.destination);
-      this.wetGain.connect(this.audioContext.destination);
+      // Connecter le filtre à la sortie avec master gain (dry + wet)
+      this.dryGain.connect(this.masterGain);
+      this.wetGain.connect(this.masterGain);
+      this.masterGain.connect(this.audioContext.destination);
       
       // Créer le son
       this.audioActive = true;
@@ -150,24 +177,50 @@ class AudiovisualInstallation {
     if (!this.audioActive || this.oscillators.length === 0) return;
     
     try {
+      // Fade-in au démarrage (0 → 1 en 3 secondes)
+      if (this.fadeInStartTime === null) {
+        this.fadeInStartTime = Date.now();
+      }
+      
+      const elapsedMs = Date.now() - this.fadeInStartTime;
+      const fadeDurationMs = 3000; // 3 secondes
+      const fadeProgress = Math.min(1, elapsedMs / fadeDurationMs);
+      this.masterGain.gain.value = fadeProgress;
+      
       // Faire dériver les fréquences lentement
-      const drift = Math.sin(this.state.time * 0.0005) * 20;
+      const drift = Math.sin(this.state.time * 0.0005) * 15; // Drift réduit
+      const baseFreq = 95;
+      const phi = (1 + Math.sqrt(5)) / 2;
+      
+      const frequencies = [
+        baseFreq,
+        baseFreq * Math.pow(phi, 2),
+        baseFreq * Math.pow(phi, 4),
+        baseFreq * Math.pow(phi, 6) * 0.80,
+        baseFreq * Math.pow(phi, 8) * 0.85
+      ];
       
       this.oscillators.forEach((osc, i) => {
-        const baseFreq = 55 * (i + 1);
         osc.frequency.setTargetAtTime(
-          baseFreq + drift,
+          frequencies[i] + drift,
           this.audioContext.currentTime,
           0.1
         );
       });
       
+      // Calculer l'énergie totale du drone (somme des gains)
+      let totalEnergy = 0;
+      this.gains.forEach(gain => {
+        totalEnergy += gain.gain.value;
+      });
+      this.state.energy = totalEnergy / this.gains.length; // Moyenne pour normaliser
+      
       // Moduler la fréquence de coupure du filtre
       // Variation lente et fluide
-      const filterFreq = 500 + Math.sin(this.state.time * 0.001) * 400 + Math.cos(this.state.time * 0.0008) * 200;
+      const filterFreq = 600 + Math.sin(this.state.time * 0.001) * 300 + Math.cos(this.state.time * 0.0008) * 150;
       if (this.filter) {
         this.filter.frequency.setTargetAtTime(
-          Math.max(200, Math.min(2000, filterFreq)),
+          Math.max(300, Math.min(1800, filterFreq)),
           this.audioContext.currentTime,
           0.05
         );
@@ -211,9 +264,9 @@ class AudiovisualInstallation {
       particles.push({
         x: Math.random() * this.width,
         y: Math.random() * this.height,
-        radius: Math.random() * 30 + 20,
-        speedX: (Math.random() - 0.5) * 0.8,      // Réduit de 2 à 0.8
-        speedY: (Math.random() - 0.5) * 0.8,      // Réduit de 2 à 0.8
+        radius: Math.random() * 20 + 15,      // Réduit de 30 + 20 à 20 + 15
+        speedX: (Math.random() - 0.5) * 0.8,
+        speedY: (Math.random() - 0.5) * 0.8,
         hueOffset: (i / count) * 360
       });
     }
@@ -222,9 +275,11 @@ class AudiovisualInstallation {
   
   updateParticles() {
     this.particles.forEach(p => {
-      // Mouvement influencé par l'énergie audio (réduit de 2 à 1.2)
-      p.x += p.speedX * (1.2 + this.state.energy * 0.3);
-      p.y += p.speedY * (1.2 + this.state.energy * 0.3);
+      // Mouvement plus lent influencé par l'énergie audio
+      // Multiplicateur: 0.3 (idle) → 6.3 (full drone energy)
+      const speedMultiplier = 0.3 + (this.state.energy * 6);
+      p.x += p.speedX * speedMultiplier;
+      p.y += p.speedY * speedMultiplier;
       
       // Rebondir sur les bords
       if (p.x - p.radius < 0 || p.x + p.radius > this.width) {
@@ -239,14 +294,13 @@ class AudiovisualInstallation {
   }
   
   draw() {
-    // Fond blanc avec légère traînée (trail effect)
-    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    // Fond noir avec légère traînée (trail effect)
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     this.ctx.fillRect(0, 0, this.width, this.height);
     this.ctx.globalAlpha = 1.0;
     
-    // Dessiner les lignes de connexion entre les sphères
-    const hue1 = (this.state.time * 0.01 + 240) % 360;
-    this.ctx.strokeStyle = `hsla(${hue1}, 50%, 40%, 0.1)`;
+    // Dessiner les lignes de connexion entre les sphères (blanc)
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
     this.ctx.lineWidth = 1;
     for (let i = 0; i < this.particles.length; i += 3) {
       if (this.particles[i + 1]) {
@@ -265,16 +319,19 @@ class AudiovisualInstallation {
     
     // Dessiner les cercles translucides
     this.particles.forEach((p, index) => {
-      const hue = (p.hueOffset + this.state.time * 0.02) % 360;
+      // Hue plus réactif à l'énergie audio
+      const hue = (p.hueOffset + this.state.time * 0.02 + this.state.energy * 50) % 360;
       
-      // Effet de pulsation basé sur l'énergie audio
-      const pulseFactor = 1 + this.state.energy * 0.3;
+      // Effet de pulsation puissant basé sur l'énergie audio
+      // Pulsation: 1 (idle) → 2.8 (full energy)
+      const pulseFactor = 1 + (this.state.energy * 1.8);
       const pulsingRadius = p.radius * pulseFactor;
       
-      // Traînée (trails)
+      // Traînée (trails) - plus long quand énergie élevée
       if (this.trails[index]) {
         this.trails[index].push({x: p.x, y: p.y});
-        if (this.trails[index].length > 8) {
+        const maxTrailLength = 8 + Math.floor(this.state.energy * 12); // 8 → 20 points
+        if (this.trails[index].length > maxTrailLength) {
           this.trails[index].shift();
         }
         
