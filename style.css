@@ -21,6 +21,9 @@
   
   --color-page-blue: #2C4251;
   --color-page-blue-dark: #152028;
+  --site-bg-image: url('images/visuel_30.webp');
+  --site-bg-overlay-light: rgba(255, 255, 240, 0.74);
+  --site-bg-overlay-dark: rgba(15, 15, 20, 0.78);
   
   --border-radius: 12px;
   --border-radius-small: 8px;
@@ -28,12 +31,19 @@
 }
 
 body {
+  --site-bg-overlay: var(--site-bg-overlay-light);
   color: var(--color-text);
   font-family: Arial, sans-serif;
-  background: var(--color-bg-light);
+  background-color: #fff;
+  background-image: linear-gradient(var(--site-bg-overlay), var(--site-bg-overlay)), var(--site-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
   transition: background-color var(--transition), color var(--transition);
   margin: 0;
   padding: 0;
+  min-height: 100vh;
 }
 
 /* ============== ACCESSIBILITÉ - FOCUS VISIBLE ============== */
@@ -63,7 +73,8 @@ a:hover {
 
 /* ============== DARK MODE ============== */
 body.dark-mode {
-  background: var(--color-dark-bg);
+  --site-bg-overlay: var(--site-bg-overlay-dark);
+  background-color: var(--color-dark-bg);
   color: var(--color-dark-text);
 }
 
