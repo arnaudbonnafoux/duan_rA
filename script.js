@@ -205,8 +205,8 @@ bioText.className = 'bio-text';
 bioText.innerHTML = `
   <h2>Le projet duan rA</h2>
   <p>duan rA est un projet qui regroupe plusieurs pratiques artistiques comme la musique, les arts visuels et le développement web.</p>
-  <p>Ce site "vitrine" propose plusieurs galeries de visuels illustrant les albums, EPs et "singles" produits par les musiciens du projet.</p>
-  <p>En outre, ce site est lui même un objet de création artistique comprenant des installations web associées à de la synthèse sonore.</p>
+  <p>Ce site « vitrine » propose plusieurs galeries de visuels illustrant les albums, EP et singles produits par les musiciens du projet.</p>
+  <p>En outre, ce site est lui-même un objet de création artistique comprenant des installations web associées à de la synthèse sonore.</p>
   <p>Le projet est né en 2025 ; il est donc destiné à évoluer très prochainement en fonction des aléas de la création elle-même et des rencontres entre artistes qu'elle pourrait provoquer.</p>
   <p>L'esthétique du projet repose sur une intuition éprouvée : rendre visible et audible, par l'expérimentation, l'invisible — ces dimensions cachées qui nous entourent mais échappent à la perception.</p>
   <p>L'intuition et l'introspection sont convoquées pour explorer cette perception primordiale et créer un ailleurs où l'imagination pose, avec authenticité, les fondements du vide et l'expression de son potentiel infini dans la création artistique.</p>
@@ -371,7 +371,7 @@ modalAudio.addEventListener('ended', () => {
 const audioToggleBtn = document.createElement('button');
 audioToggleBtn.className = 'modal-audio-btn';
 audioToggleBtn.textContent = '🔊';
-audioToggleBtn.setAttribute('aria-label', 'Muet - Cliquez pour couper le son');
+audioToggleBtn.setAttribute('aria-label', 'Son actif - Cliquez pour couper le son');
 let isAudioPlaying = false;
 audioToggleBtn.addEventListener('click', () => {
   if (isAudioPlaying) {

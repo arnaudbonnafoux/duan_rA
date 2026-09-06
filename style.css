@@ -269,6 +269,16 @@ footer {
   justify-content: space-between;
 }
 
+footer > nav[aria-label="Liens légaux et information"] a + a {
+  margin-left: 0.75rem;
+}
+
+footer > nav[aria-label="Liens légaux et information"] a {
+  text-decoration: underline;
+  opacity: 1;
+  transition: none;
+}
+
 /* ============== LINKS ============== */
 a {
   color: var(--color-primary);
