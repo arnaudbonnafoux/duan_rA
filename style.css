@@ -22,8 +22,8 @@
   --color-page-blue: #2C4251;
   --color-page-blue-dark: #152028;
   --site-bg-image: url('images/visuel_30.webp');
-  --site-bg-overlay-light: rgba(255, 255, 240, 0.74);
-  --site-bg-overlay-dark: rgba(15, 15, 20, 0.78);
+  --site-bg-overlay-light: rgba(255, 255, 240, 0.90);
+  --site-bg-overlay-dark: rgba(15, 15, 20, 0.92);
   
   --border-radius: 12px;
   --border-radius-small: 8px;
