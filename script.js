@@ -51,7 +51,7 @@ const images1 = [
   { src: 'images/visuel_2.webp', title: 'Splendores Nihili' },
   { src: 'images/visuel_3.webp', title: 'Topographia Somni' },
   { src: 'images/visuel_4.webp', title: 'Fragmentum Temporis' },
-  { src: 'images/visuel_6.webp', title: 'Viae Errantes' },
+  { src: 'images/visuel_6.webp', title: 'Cyclops Sonoris' },
   { src: 'images/visuel_7.webp', title: 'Respiratio Vacui' },
   { src: 'images/visuel_8.webp', title: 'Spectra Lucis' },
   { src: 'images/visuel_9.webp', title: 'Fluxus Aeternalis' },
