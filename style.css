@@ -44,6 +44,13 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+  width: 100%;
 }
 
 /* ============== ACCESSIBILITÉ - FOCUS VISIBLE ============== */
@@ -183,6 +190,10 @@ body.dark-mode .theme-toggle:hover {
   gap: 24px;
 }
 
+header {
+  padding-top: 20px;
+}
+
 h2 {
   text-align: center;
   border-radius: var(--border-radius);
@@ -256,9 +267,11 @@ h2 {
 footer {
   border-radius: var(--border-radius);
   text-align: center;
-  margin: 20px auto;
-  background-color: var(--color-accent);
+  width: 85%;
   max-width: 85%;
+  margin: 20px auto;
+  box-sizing: border-box;
+  background-color: var(--color-accent);
   box-shadow: 0 4px 10px var(--color-shadow);
 }
 
@@ -353,6 +366,7 @@ body.dark-mode .page-container h1 {
 
 .gallery-container {
   max-width: 900px;
+  min-height: clamp(480px, 65vh, 1100px);
   margin: 0 auto;
   padding: 20px;
   text-align: center;
@@ -527,7 +541,7 @@ body.dark-mode .page-container h1 {
 .bio-button {
   background-color: #340b5a;
   color: #fff;
-  border: 2px solid #fff;
+  border: none;
   padding: 8px 16px;
   font-size: 12px;
   cursor: pointer;
@@ -801,7 +815,9 @@ body.dark-mode .page-container h1 {
   }
 
   footer {
+    width: 95%;
     max-width: 95%;
+    margin: 20px auto;
   }
 
   .div_footer {
@@ -855,6 +871,63 @@ body.dark-mode .page-container h1 {
 
   .modal-next {
     right: 5px;
+  }
+}
+
+@media (min-width: 3840px) {
+  body {
+    font-size: 1.2rem;
+  }
+
+  .div_header {
+    gap: 40px;
+    padding: 24px;
+  }
+
+  .img_header {
+    max-width: 220px;
+  }
+
+  .gallery-container {
+    max-width: 1600px;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  .img-wrapper {
+    height: clamp(280px, 22vw, 420px);
+  }
+
+  h1 {
+    font-size: 3.2rem;
+  }
+
+  h2 {
+    font-size: 2.4rem;
+  }
+
+  .tagline {
+    font-size: 1.25rem;
+  }
+
+  .tabs-container {
+    max-width: 1400px;
+    gap: 20px;
+  }
+
+  .tab-button {
+    padding: 18px 32px;
+    font-size: 1.3rem;
+  }
+
+  .gallery-title {
+    font-size: 1.3rem;
+  }
+
+  footer > nav[aria-label="Liens légaux et information"] a {
+    font-size: 1rem;
   }
 }
 
