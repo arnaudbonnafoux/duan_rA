@@ -287,6 +287,10 @@ footer::before {
   animation: rain 7s linear infinite;
 }
 
+.page-container footer::before {
+  display: none;
+}
+
 .div_header > div,
 footer > * {
   position: relative;
