@@ -159,6 +159,22 @@ body.dark-mode .theme-toggle:hover {
   padding-top: 4px;
 }
 
+.cocktail-icon {
+  animation: cocktail-blink 3s ease-in-out infinite;
+}
+
+@keyframes cocktail-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cocktail-icon {
+    animation: none;
+  }
+}
+
 .theme-toggle {
   background: none;
   border: 2px solid var(--color-text-light);
