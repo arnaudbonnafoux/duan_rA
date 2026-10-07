@@ -23,7 +23,7 @@
   --color-page-blue-dark: #152028;
   --site-bg-image: url('images/visuel_30.webp');
   --site-bg-overlay-light: rgba(255, 255, 240, 0.90);
-  --site-bg-overlay-dark: rgba(15, 15, 20, 0.92);
+  --site-bg-overlay-dark: rgba(15, 15, 20, 0.82);
   
   --border-radius: 12px;
   --border-radius-small: 8px;
@@ -179,6 +179,9 @@ body.dark-mode .tagline {
   background-color: var(--color-accent);
   display: flex;
   gap: 24px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
 }
 
 header {
@@ -264,6 +267,43 @@ footer {
   box-sizing: border-box;
   background-color: var(--color-accent);
   box-shadow: 0 4px 10px var(--color-shadow);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.div_header::before,
+footer::before {
+  content: "";
+  position: absolute;
+  inset: -15% 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.45;
+  background-image:
+    linear-gradient(105deg, transparent 47%, rgba(190, 220, 235, 0.3) 50%, transparent 53%),
+    linear-gradient(105deg, transparent 47%, rgba(190, 220, 235, 0.18) 50%, transparent 53%);
+  background-size: 42px 28px, 68px 38px;
+  animation: rain 7s linear infinite;
+}
+
+.div_header > div,
+footer > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes rain {
+  to {
+    transform: translateY(15%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .div_header::before,
+  footer::before {
+    animation: none;
+  }
 }
 
 .div_footer {
