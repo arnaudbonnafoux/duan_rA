@@ -172,6 +172,7 @@ bioText.innerHTML = `
   <p>Ce site « vitrine » propose plusieurs galeries de visuels illustrant les albums, EP et singles produits par les musiciens du projet.</p>
   <p>En outre, ce site est lui-même un objet de création artistique comprenant des installations web associées à de la synthèse sonore.</p>
   <p>Le projet est né en 2025 ; il est donc destiné à évoluer très prochainement en fonction des aléas de la création elle-même et des rencontres entre artistes qu'elle pourrait provoquer.</p>
+  <p>Cette structure se veut aussi un refuge pour les artistes aux esthétiques mouvantes, qui ne se reconnaissent dans aucune forme figée et souhaitent créer librement, au gré des rencontres et des expérimentations.</p>
   <p>L'esthétique du projet repose sur une intuition éprouvée : rendre visible et audible, par l'expérimentation, l'invisible — ces dimensions cachées qui nous entourent mais échappent à la perception.</p>
   <p>L'intuition et l'introspection sont convoquées pour explorer cette perception primordiale et créer un ailleurs où l'imagination pose, avec authenticité, les fondements du vide et l'expression de son potentiel infini dans la création artistique.</p>
   <p>Dans cette démarche, la <em>tabula rasa</em> n'est pas un effacement définitif, mais un point de départ : suspendre les formes et les certitudes pour laisser émerger, du vide, de nouvelles perceptions et possibilités de création.</p>
