@@ -139,7 +139,7 @@ body.dark-mode .tagline {
 }
 
 .img_header {
-  border-radius: var(--border-radius);
+  border-radius: 0;
   max-width: 150px;
   aspect-ratio: 1;
   user-select: none;
