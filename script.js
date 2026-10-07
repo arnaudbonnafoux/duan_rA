@@ -211,7 +211,6 @@ bioText.innerHTML = `
   <p>L'esthétique du projet repose sur une intuition éprouvée : rendre visible et audible, par l'expérimentation, l'invisible — ces dimensions cachées qui nous entourent mais échappent à la perception.</p>
   <p>L'intuition et l'introspection sont convoquées pour explorer cette perception primordiale et créer un ailleurs où l'imagination pose, avec authenticité, les fondements du vide et l'expression de son potentiel infini dans la création artistique.</p>
   <p>Dans cette démarche, la <em>tabula rasa</em> n'est pas un effacement définitif, mais un point de départ : suspendre les formes et les certitudes pour laisser émerger, du vide, de nouvelles perceptions et possibilités de création.</p>
-  <p><a href="https://www.instagram.com/projet_duanra/" target="_blank" rel="noopener noreferrer" aria-label="Compte Instagram de duan rA"><i class="fab fa-instagram"></i></a><span style="display: inline-block; width: 20px;"></span><a href="https://arnaudbonnafoux.github.io/" target="_blank" rel="noopener noreferrer" aria-label="Portfolio d'Arnaud Bonnafoux"><i class="fas fa-music"></i></a></p>
 `;
 
 bioContent.appendChild(bioCLoseBtn);
