@@ -56,7 +56,9 @@ main {
 /* ============== ACCESSIBILITÉ - FOCUS VISIBLE ============== */
 button:focus-visible,
 a:focus-visible,
-[role="button"]:focus-visible {
+[role="button"]:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 2px;
 }
@@ -306,6 +308,89 @@ footer > nav[aria-label="Liens légaux et information"] a {
   text-decoration: underline;
   opacity: 1;
   transition: none;
+}
+
+.artist-signup {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 12px 20px 24px;
+  text-align: left;
+}
+
+.artist-signup h2 {
+  margin: 0;
+}
+
+.artist-signup > p {
+  text-align: center;
+}
+
+.artist-signup-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.artist-signup label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.artist-signup label:nth-child(n + 3) {
+  grid-column: 1 / -1;
+}
+
+.artist-signup input,
+.artist-signup textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-text-lighter);
+  border-radius: var(--border-radius-small);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--color-primary);
+  font: inherit;
+}
+
+.artist-signup textarea {
+  resize: vertical;
+}
+
+.artist-signup button {
+  display: block;
+  margin: 18px auto 0;
+  padding: 10px 18px;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius-small);
+  background: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.artist-signup button:hover {
+  background: transparent;
+  color: var(--color-primary);
+}
+
+body.dark-mode .artist-signup input,
+body.dark-mode .artist-signup textarea {
+  border-color: var(--color-dark-border);
+  background: rgba(30, 30, 35, 0.8);
+  color: var(--color-dark-text);
+}
+
+body.dark-mode .artist-signup button {
+  border-color: var(--color-dark-text);
+  background: var(--color-dark-text);
+  color: var(--color-dark-bg);
+}
+
+body.dark-mode .artist-signup button:hover {
+  background: transparent;
+  color: var(--color-dark-text);
 }
 
 /* ============== LINKS ============== */
@@ -840,6 +925,19 @@ body.dark-mode .page-container h1 {
     flex-direction: row;
     gap: 10px;
     text-align: center;
+  }
+
+  .artist-signup {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .artist-signup-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .artist-signup label:nth-child(n) {
+    grid-column: 1;
   }
 
   .bio-button {
