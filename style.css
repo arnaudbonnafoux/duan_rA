@@ -658,9 +658,9 @@ body.dark-mode .page-container h1 {
 }
 
 .bio-content {
-  background-color: #340b5a;
-  color: #fff;
-  border: 2px solid #fff;
+  background-color: #29272f;
+  color: var(--color-dark-text);
+  border: 1px solid var(--color-dark-border);
   border-radius: 8px;
   padding: 30px;
   max-width: 600px;
