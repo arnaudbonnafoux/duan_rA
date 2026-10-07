@@ -65,7 +65,9 @@ textarea:focus-visible {
 
 body.dark-mode button:focus-visible,
 body.dark-mode a:focus-visible,
-body.dark-mode [role="button"]:focus-visible {
+body.dark-mode [role="button"]:focus-visible,
+body.dark-mode input:focus-visible,
+body.dark-mode textarea:focus-visible {
   outline: 3px solid #87ceeb;
   outline-offset: 2px;
 }
@@ -136,15 +138,6 @@ body.dark-mode .tagline {
   color: var(--color-dark-text-secondary);
 }
 
-body.dark-mode .theme-toggle {
-  border-color: rgba(240, 240, 240, 0.3);
-  color: var(--color-dark-text);
-}
-
-body.dark-mode .theme-toggle:hover {
-  border-color: var(--color-dark-text);
-}
-
 .img_header {
   border-radius: var(--border-radius);
   max-width: 150px;
@@ -175,26 +168,6 @@ body.dark-mode .theme-toggle:hover {
   .cocktail-icon {
     animation: none;
   }
-}
-
-.theme-toggle {
-  background: none;
-  border: 2px solid var(--color-text-light);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: var(--border-radius-small);
-  transition: all var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 50px;
-  height: 50px;
-}
-
-.theme-toggle:hover {
-  border-color: var(--color-primary);
-  transform: scale(1.1);
 }
 
 .div_header {
@@ -307,7 +280,11 @@ footer > nav[aria-label="Liens légaux et information"] a + a {
 footer > nav[aria-label="Liens légaux et information"] a {
   text-decoration: underline;
   opacity: 1;
-  transition: none;
+  transition: color var(--transition);
+}
+
+body.dark-mode footer > nav[aria-label="Liens légaux et information"] a {
+  color: var(--color-dark-text-secondary);
 }
 
 .artist-signup {
@@ -640,9 +617,9 @@ body.dark-mode .page-container h1 {
 /* =================== STYLES BIO =================== */
 
 .bio-button {
-  background-color: #340b5a;
-  color: #fff;
-  border: none;
+  background-color: var(--color-dark-accent);
+  color: var(--color-dark-text);
+  border: 1px solid var(--color-dark-border);
   padding: 8px 16px;
   font-size: 12px;
   cursor: pointer;
@@ -656,8 +633,9 @@ body.dark-mode .page-container h1 {
 }
 
 .bio-button:hover {
-  background-color: #fff;
-  color: #340b5a;
+  background-color: var(--color-dark-accent-hover);
+  border-color: var(--color-dark-border);
+  color: var(--color-dark-text);
   transform: scale(1.05);
 }
 

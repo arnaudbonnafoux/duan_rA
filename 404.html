@@ -26,22 +26,19 @@
         }
         .error-container a {
             padding: 12px 24px;
-            background-color: rgba(52, 11, 90, 0.2);
-            color: var(--color-primary);
+            background-color: rgba(200, 200, 200, 0.1);
+            color: #87ceeb;
             text-decoration: none;
             border-radius: 8px;
             transition: all 0.3s ease;
             display: inline-block;
         }
         .error-container a:hover {
-            background-color: rgba(52, 11, 90, 0.4);
-        }
-        body.dark-mode .error-container a {
-            color: #87ceeb;
+            background-color: rgba(200, 200, 200, 0.2);
         }
     </style>
 </head>
-<body>
+<body class="dark-mode">
     <header>
         <div class="div_header">
             <div>
@@ -76,13 +73,5 @@
         <p style="font-size: x-small; text-align: center; padding-bottom: 8px;">
             &copy; 2026 Projet duan rA</p>
     </footer>
-
-    <script>
-        // Charger le thème sauvegardé
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
-    </script>
 </body>
 </html>

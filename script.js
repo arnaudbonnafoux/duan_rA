@@ -7,42 +7,6 @@ if (headerImg) {
   headerImg.addEventListener('dragstart', (e) => e.preventDefault());
 }
 
-// =================== GESTION MODE SOMBRE ===================
-
-const themeToggle = document.getElementById('themeToggle');
-const htmlElement = document.documentElement;
-
-// Charger la préférence de thème
-const savedTheme = localStorage.getItem('theme') || 'light';
-if (savedTheme === 'dark') {
-  document.body.classList.add('dark-mode');
-  themeToggle.textContent = '☀️';
-}
-
-themeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-  
-  if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('theme', 'dark');
-    themeToggle.textContent = '☀️';
-    themeToggle.setAttribute('aria-label', 'Activer le mode clair');
-  } else {
-    localStorage.setItem('theme', 'light');
-    themeToggle.textContent = '🌙';
-    themeToggle.setAttribute('aria-label', 'Activer le mode sombre');
-  }
-  // Annoncer le changement aux lecteurs d'écran
-  const announcement = document.body.classList.contains('dark-mode') ? 'Mode sombre activé' : 'Mode clair activé';
-  const ariaLive = document.createElement('div');
-  ariaLive.setAttribute('role', 'status');
-  ariaLive.setAttribute('aria-live', 'polite');
-  ariaLive.style.position = 'absolute';
-  ariaLive.style.left = '-10000px';
-  ariaLive.textContent = announcement;
-  document.body.appendChild(ariaLive);
-  setTimeout(() => ariaLive.remove(), 1000);
-});
-
 // =================== LISTES DES IMAGES ===================
 
 // Liste des images - Galerie 1
