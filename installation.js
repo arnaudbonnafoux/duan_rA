@@ -46,6 +46,103 @@ class AudiovisualInstallation {
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     this.rainDrops = this.createRainDrops();
+    this.createVolcano();
+  }
+
+  // =================== VOLCAN DE FOND (TRÈS DISCRET) ===================
+
+  createVolcano() {
+    const h = this.height;
+    const w = this.width;
+    this.volcano = {
+      peakX: w * 0.24,
+      peakY: h * 0.68,
+      baseLeft: -w * 0.05,
+      baseRight: w * 0.52,
+      craterHalfWidth: w * 0.03,
+      time: 0
+    };
+    this.embers = Array.from({ length: 14 }, () => this.createEmber(true));
+  }
+
+  createEmber(randomAge = false) {
+    const v = this.volcano;
+    const life = 5 + Math.random() * 5;
+    return {
+      x: v.peakX + (Math.random() - 0.5) * v.craterHalfWidth * 1.6,
+      y: v.peakY - Math.random() * 6,
+      vx: (Math.random() - 0.3) * 6,
+      vy: -(14 + Math.random() * 22),
+      size: 0.8 + Math.random() * 1.2,
+      life,
+      age: randomAge ? Math.random() * life : 0
+    };
+  }
+
+  updateVolcano(deltaTime) {
+    if (!this.volcano) return;
+    this.volcano.time += deltaTime;
+    this.embers.forEach((e, i) => {
+      e.age += deltaTime;
+      e.x += e.vx * deltaTime;
+      e.y += e.vy * deltaTime;
+      if (e.age >= e.life) this.embers[i] = this.createEmber();
+    });
+  }
+
+  drawVolcano() {
+    const v = this.volcano;
+    if (!v) return;
+    const ctx = this.ctx;
+    const baseY = this.height;
+    const pulse = 0.5 + 0.5 * Math.sin(v.time * 0.35);
+
+    ctx.save();
+
+    // Silhouette : flancs concaves, cratère légèrement échancré
+    ctx.beginPath();
+    ctx.moveTo(v.baseLeft, baseY);
+    ctx.quadraticCurveTo(
+      v.peakX - v.craterHalfWidth * 4, baseY - (baseY - v.peakY) * 0.18,
+      v.peakX - v.craterHalfWidth, v.peakY
+    );
+    ctx.quadraticCurveTo(v.peakX, v.peakY + this.height * 0.012, v.peakX + v.craterHalfWidth, v.peakY);
+    ctx.quadraticCurveTo(
+      v.peakX + v.craterHalfWidth * 4.5, baseY - (baseY - v.peakY) * 0.2,
+      v.baseRight, baseY
+    );
+    ctx.closePath();
+
+    // Les alphas sont faibles : le fond se ré-estompe à chaque image et les cumule
+    const body = ctx.createLinearGradient(0, v.peakY, 0, baseY);
+    body.addColorStop(0, 'rgba(95, 40, 60, 0.13)');
+    body.addColorStop(1, 'rgba(40, 18, 45, 0.04)');
+    ctx.fillStyle = body;
+    ctx.fill();
+
+    // Lueur du cratère, qui respire très lentement
+    ctx.globalCompositeOperation = 'lighter';
+    const glowRadius = this.width * 0.09;
+    const glow = ctx.createRadialGradient(v.peakX, v.peakY, 0, v.peakX, v.peakY, glowRadius);
+    glow.addColorStop(0, `rgba(255, 110, 40, ${0.09 + 0.06 * pulse})`);
+    glow.addColorStop(0.4, `rgba(200, 50, 30, ${0.035 + 0.025 * pulse})`);
+    glow.addColorStop(1, 'rgba(120, 20, 20, 0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(v.peakX, v.peakY, glowRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Braises
+    this.embers.forEach(e => {
+      const t = e.age / e.life;
+      const alpha = 0.35 * Math.sin(Math.PI * t);
+      ctx.fillStyle = `rgba(255, ${140 - 70 * t}, 50, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.restore();
   }
   
   // =================== WEB AUDIO API ===================
@@ -387,6 +484,7 @@ class AudiovisualInstallation {
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     this.ctx.fillRect(0, 0, this.width, this.height);
     this.ctx.globalAlpha = 1.0;
+    this.drawVolcano();
     this.drawRain();
     
     // Dessiner les lignes de connexion entre les sphères (blanc)
@@ -562,6 +660,7 @@ class AudiovisualInstallation {
     
     this.updateAudio();
     this.updateRain(deltaTime);
+    this.updateVolcano(deltaTime);
     this.updateParticles();
     this.updateText();
     this.draw();
