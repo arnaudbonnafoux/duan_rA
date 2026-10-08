@@ -488,19 +488,13 @@ class AudiovisualInstallation {
     this.drawRain();
     
     // Dessiner les lignes de connexion entre les sphères (blanc)
-    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
     this.ctx.lineWidth = 1;
     for (let i = 0; i < this.particles.length; i += 3) {
       if (this.particles[i + 1]) {
         this.ctx.beginPath();
         this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
         this.ctx.lineTo(this.particles[i + 1].x, this.particles[i + 1].y);
-        this.ctx.stroke();
-      }
-      if (this.particles[i + 2]) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
-        this.ctx.lineTo(this.particles[i + 2].x, this.particles[i + 2].y);
         this.ctx.stroke();
       }
     }
