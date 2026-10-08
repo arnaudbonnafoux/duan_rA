@@ -6,6 +6,11 @@ class AudiovisualInstallation {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     
+    // Cycle de la pluie (apparition/disparition) : état initialisé avant le premier resize
+    this.rainCyclePeriod = 40; // secondes pour un cycle complet
+    this.rainCycleTime = 0;
+    this.rainIntensity = 0;
+
     // Redimensionner le canvas au fullscreen
     this.resizeCanvas();
     window.addEventListener('resize', () => this.resizeCanvas());
@@ -40,6 +45,7 @@ class AudiovisualInstallation {
     this.canvas.height = window.innerHeight;
     this.width = this.canvas.width;
     this.height = this.canvas.height;
+    this.rainDrops = this.createRainDrops();
   }
   
   // =================== WEB AUDIO API ===================
@@ -251,6 +257,44 @@ class AudiovisualInstallation {
     }
     return particles;
   }
+
+  createRainDrops() {
+    const count = Math.min(420, Math.max(90, Math.round(this.width * this.height / 8000)));
+    return Array.from({ length: count }, () => ({
+      x: Math.random() * this.width,
+      y: Math.random() * this.height,
+      length: Math.random() * 8 + 6,
+      speed: Math.random() * 11 + 14,
+      opacity: Math.random() * 0.25 + 0.35
+    }));
+  }
+
+  updateRain(deltaTime) {
+    // Cycle d'apparition/disparition : 0 → 1 → 0 sur rainCyclePeriod secondes
+    this.rainCycleTime = (this.rainCycleTime || 0) + deltaTime;
+    const phase = (this.rainCycleTime / this.rainCyclePeriod) * Math.PI * 2;
+    this.rainIntensity = 0.5 - 0.5 * Math.cos(phase);
+
+    this.rainDrops.forEach(drop => {
+      drop.y += drop.speed * deltaTime;
+      if (drop.y - drop.length > this.height) {
+        drop.x = Math.random() * this.width;
+        drop.y = -drop.length;
+      }
+    });
+  }
+
+  drawRain() {
+    if (!this.rainIntensity || this.rainIntensity < 0.01) return;
+    this.rainDrops.forEach(drop => {
+      this.ctx.beginPath();
+      this.ctx.moveTo(drop.x, drop.y);
+      this.ctx.lineTo(drop.x + drop.length * 0.25, drop.y + drop.length);
+      this.ctx.strokeStyle = `rgba(190, 220, 235, ${drop.opacity * this.rainIntensity})`;
+      this.ctx.lineWidth = 1;
+      this.ctx.stroke();
+    });
+  }
   
   updateParticles() {
     this.particles.forEach(p => {
@@ -277,6 +321,7 @@ class AudiovisualInstallation {
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     this.ctx.fillRect(0, 0, this.width, this.height);
     this.ctx.globalAlpha = 1.0;
+    this.drawRain();
     
     // Dessiner les lignes de connexion entre les sphères (blanc)
     this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
@@ -354,7 +399,7 @@ class AudiovisualInstallation {
       ],
       
       // Timing : 15 secondes d'affichage total
-      displayDuration: 900,   // 15 secondes (900 frames à 60fps)
+      displayDuration: 2700,  // 45 secondes (2700 frames à 60fps)
       initialDelayFrames: 360,  // Délai initial de 6 secondes avant affichage
       
       // État courant
@@ -419,25 +464,38 @@ class AudiovisualInstallation {
     const startY = centerY - (lineSpacing * 2); // Commencer 2 lignes avant le centre
     
     // Afficher les 5 phrases empilées verticalement
+    // Apparition progressive : chaque phrase s'estompe 6 s après la précédente
+    const fadeInFrames = 600;
+    const fadeInStagger = 360;
     ts.phrases.forEach((phrase, index) => {
       const yPos = startY + (index * lineSpacing);
+      const linearIn = Math.min(1, Math.max(0, (framesSinceDelay - index * fadeInStagger) / fadeInFrames));
+      const fadeIn = linearIn * linearIn * (3 - 2 * linearIn); // smoothstep
+      const phraseOpacity = opacity * fadeIn;
+      if (phraseOpacity <= 0) return;
       
       // Ombre pour lisibilité
-      this.ctx.fillStyle = `rgba(0, 0, 0, ${0.7 * opacity})`;
+      this.ctx.fillStyle = `rgba(0, 0, 0, ${0.7 * phraseOpacity})`;
       this.ctx.fillText(phrase, centerX + 2, yPos + 2);
       
       // Texte principal blanc avec opacité variable
-      this.ctx.fillStyle = `rgba(255, 255, 255, ${0.95 * opacity})`;
+      this.ctx.fillStyle = `rgba(255, 255, 255, ${0.95 * phraseOpacity})`;
       this.ctx.fillText(phrase, centerX, yPos);
     });
     
     this.ctx.restore();
   }
   
-  animate = () => {
+  animate = (timestamp) => {
+    const currentTime = timestamp ?? performance.now();
+    const deltaTime = this.lastFrameTime === undefined
+      ? 0
+      : Math.min((currentTime - this.lastFrameTime) / 1000, 0.05);
+    this.lastFrameTime = currentTime;
     this.state.time++;
     
     this.updateAudio();
+    this.updateRain(deltaTime);
     this.updateParticles();
     this.updateText();
     this.draw();
