@@ -343,6 +343,58 @@ class AudiovisualInstallation {
     }
   }
   
+  // =================== TAMBOUR ===================
+
+  // Planifie en avance les frappes de tambour sur l'horloge audio
+  scheduleDrums() {
+    const ctx = this.audioContext;
+    // Le tambour arrive quand le texte a disparu
+    if (this.textState && !this.textState.isComplete) return;
+    if (this.nextBeatTime === undefined) {
+      this.nextBeatTime = ctx.currentTime + 0.5;
+      this.beatIndex = 0;
+    }
+    const stepDuration = 0.5; // Croche à 60 BPM : pulsation lente
+    // Motif de 8 pas : 0 = silence, sinon intensité (tambour grave, ternaire discret)
+    const pattern = [1, 0, 0.45, 0, 0.8, 0, 0.45, 0.3];
+    while (this.nextBeatTime < ctx.currentTime + 0.3) {
+      const velocity = pattern[this.beatIndex % pattern.length];
+      if (velocity > 0) this.playDrum(this.nextBeatTime, velocity);
+      this.nextBeatTime += stepDuration;
+      this.beatIndex++;
+    }
+  }
+
+  playDrum(time, velocity) {
+    const ctx = this.audioContext;
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, time);
+    env.gain.exponentialRampToValueAtTime(0.42 * velocity, time + 0.005);
+    env.gain.exponentialRampToValueAtTime(0.0001, time + 0.6);
+
+    // Corps : sinus + triangle pour des harmoniques plus claires
+    [['sine', 1], ['triangle', 0.2]].forEach(([type, level]) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      g.gain.value = level;
+      osc.type = type;
+      osc.frequency.setValueAtTime(140, time);
+      osc.frequency.exponentialRampToValueAtTime(55, time + 0.2);
+      osc.connect(g);
+      g.connect(env);
+      osc.start(time);
+      osc.stop(time + 0.7);
+    });
+
+    // Contourne le filtre passe-bas du drone (sinon le son est étouffé), mais garde la réverbération
+    const tone = ctx.createBiquadFilter();
+    tone.type = 'lowpass';
+    tone.frequency.value = 450;
+    env.connect(tone);
+    tone.connect(this.dryGain);
+    tone.connect(this.wetGain);
+  }
+
   updateAudio() {
     if (!this.audioActive || this.oscillators.length === 0) return;
     
@@ -357,6 +409,8 @@ class AudiovisualInstallation {
       const fadeProgress = Math.min(1, elapsedMs / fadeDurationMs);
       this.masterGain.gain.value = fadeProgress;
       
+      this.scheduleDrums();
+
       // Faire dériver les fréquences lentement
       const drift = Math.sin(this.state.time * 0.0005) * 15; // Drift réduit
       const baseFreq = 95;
