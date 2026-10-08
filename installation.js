@@ -47,6 +47,93 @@ class AudiovisualInstallation {
     this.height = this.canvas.height;
     this.rainDrops = this.createRainDrops();
     this.createVolcano();
+    this.createBlackHole();
+  }
+
+  // =================== TROU NOIR ===================
+
+  createBlackHole() {
+    const r = Math.min(this.width, this.height) * 0.055;
+    this.blackHole = {
+      baseX: this.width * 0.7,
+      baseY: this.height * 0.28,
+      x: this.width * 0.7,
+      y: this.height * 0.28,
+      t: 0,
+      baseTilt: -0.35,
+      r,
+      tilt: -0.35,
+      particles: Array.from({ length: 140 }, () => ({
+        angle: Math.random() * Math.PI * 2,
+        dist: r * (1.5 + Math.random() * 2.6),
+        size: 0.6 + Math.random() * 1.2
+      }))
+    };
+  }
+
+  updateBlackHole(deltaTime) {
+    const bh = this.blackHole;
+    if (!bh) return;
+    // Dérive lente en ellipse et léger balancement du disque
+    bh.t += deltaTime;
+    bh.x = bh.baseX + Math.sin(bh.t * 0.12) * this.width * 0.04;
+    bh.y = bh.baseY + Math.cos(bh.t * 0.09) * this.height * 0.035;
+    bh.tilt = bh.baseTilt + Math.sin(bh.t * 0.2) * 0.12;
+    bh.particles.forEach(p => {
+      // Plus près = plus rapide
+      p.angle += deltaTime * 0.9 * Math.pow(bh.r / p.dist, 1.2) * 2;
+    });
+  }
+
+  drawBlackHole() {
+    const bh = this.blackHole;
+    if (!bh) return;
+    const ctx = this.ctx;
+    const squash = 0.28;
+    ctx.save();
+    ctx.translate(bh.x, bh.y);
+    ctx.rotate(bh.tilt);
+
+    // Halo de lentille gravitationnelle
+    const halo = ctx.createRadialGradient(0, 0, bh.r, 0, 0, bh.r * 4.5);
+    halo.addColorStop(0, 'rgba(255, 170, 90, 0.10)');
+    halo.addColorStop(1, 'rgba(255, 170, 90, 0)');
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(0, 0, bh.r * 4.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Particules du disque d'accrétion (partie lointaine, derrière l'horizon)
+    ctx.globalCompositeOperation = 'lighter';
+    const drawParticles = back => {
+      bh.particles.forEach(p => {
+        const sin = Math.sin(p.angle);
+        if ((sin < 0) !== back) return;
+        const x = Math.cos(p.angle) * p.dist;
+        const y = sin * p.dist * squash;
+        const heat = 1 - (p.dist - bh.r * 1.5) / (bh.r * 2.6);
+        ctx.fillStyle = `rgba(255, ${Math.round(150 + heat * 90)}, ${Math.round(80 + heat * 150)}, ${0.25 + heat * 0.35})`;
+        ctx.beginPath();
+        ctx.arc(x, y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    };
+    drawParticles(true);
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Horizon des événements
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(0, 0, bh.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 200, 140, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Partie proche du disque, devant l'horizon
+    ctx.globalCompositeOperation = 'lighter';
+    drawParticles(false);
+    ctx.restore();
   }
 
   // =================== VOLCAN DE FOND (TRÈS DISCRET) ===================
@@ -486,6 +573,7 @@ class AudiovisualInstallation {
     this.ctx.globalAlpha = 1.0;
     this.drawVolcano();
     this.drawRain();
+    this.drawBlackHole();
     
     // Dessiner les lignes de connexion entre les sphères (blanc)
     this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
@@ -655,6 +743,7 @@ class AudiovisualInstallation {
     this.updateAudio();
     this.updateRain(deltaTime);
     this.updateVolcano(deltaTime);
+    this.updateBlackHole(deltaTime);
     this.updateParticles();
     this.updateText();
     this.draw();
