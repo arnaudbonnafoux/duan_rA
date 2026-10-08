@@ -284,7 +284,8 @@ footer::before {
     linear-gradient(105deg, transparent 47%, rgba(190, 220, 235, 0.3) 50%, transparent 53%),
     linear-gradient(105deg, transparent 47%, rgba(190, 220, 235, 0.18) 50%, transparent 53%);
   background-size: 42px 28px, 68px 38px;
-  animation: rain 7s linear infinite;
+  background-position: 0 0, 0 0;
+  animation: rain 106.4s linear infinite;
 }
 
 .page-container footer::before {
@@ -299,7 +300,7 @@ footer > * {
 
 @keyframes rain {
   to {
-    transform: translateY(15%);
+    background-position: 0 532px, 0 532px;
   }
 }
 
