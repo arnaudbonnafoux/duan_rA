@@ -259,14 +259,38 @@ class AudiovisualInstallation {
   }
 
   createRainDrops() {
-    const count = Math.min(420, Math.max(90, Math.round(this.width * this.height / 8000)));
-    return Array.from({ length: count }, () => ({
-      x: Math.random() * this.width,
-      y: Math.random() * this.height,
-      length: Math.random() * 8 + 6,
-      speed: Math.random() * 11 + 14,
-      opacity: Math.random() * 0.25 + 0.35
-    }));
+    const count = Math.min(1200, Math.max(300, Math.round(this.width * this.height / 2200)));
+    const gaussian = () => {
+      const u = 1 - Math.random();
+      return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random());
+    };
+
+    // Bande diagonale (haut-droite → bas-gauche) : pente en pixels de x par pixel de y
+    this.bandSlope = -0.7 * this.width / this.height;
+    const norm = Math.hypot(this.bandSlope, 1);
+    this.bandDirX = this.bandSlope / norm;
+    this.bandDirY = 1 / norm;
+    const bandSigma = this.width * 0.07;
+
+    return Array.from({ length: count }, () => {
+      const inBand = Math.random() < 0.8;
+      return {
+        y: Math.random() * this.height,
+        // Décalage horizontal par rapport à l'axe de la bande : serré dans la bande, large pour les étoiles éparses
+        offset: inBand ? gaussian() * bandSigma : (Math.random() - 0.5) * this.width * 1.2,
+        length: Math.random() * 8 + 6,
+        speed: Math.random() * 11 + 14,
+        opacity: (Math.random() * 0.3 + 0.7) * (inBand ? 1 : 0.45),
+        hue: 200 + Math.random() * 80,          // bleu → violet
+        lightness: 75 + Math.random() * 20,     // blanc bleuté
+        twinklePhase: Math.random() * Math.PI * 2,
+        twinkleSpeed: 0.8 + Math.random() * 1.6
+      };
+    });
+  }
+
+  bandCenterX(y) {
+    return this.width * 0.85 + this.bandSlope * y;
   }
 
   updateRain(deltaTime) {
@@ -278,7 +302,6 @@ class AudiovisualInstallation {
     this.rainDrops.forEach(drop => {
       drop.y += drop.speed * deltaTime;
       if (drop.y - drop.length > this.height) {
-        drop.x = Math.random() * this.width;
         drop.y = -drop.length;
       }
     });
@@ -286,14 +309,57 @@ class AudiovisualInstallation {
 
   drawRain() {
     if (!this.rainIntensity || this.rainIntensity < 0.01) return;
+    const seconds = this.rainCycleTime;
+
+    this.ctx.save();
+    // Mélange additif : les gouttes qui se superposent s'illuminent comme un amas d'étoiles
+    this.ctx.globalCompositeOperation = 'lighter';
+    this.ctx.lineCap = 'round';
+
+    // Lueur diffuse le long de la bande, perpendiculairement à son axe
+    const glowCenterX = this.bandCenterX(this.height / 2);
+    const glowCenterY = this.height / 2;
+    const perpX = this.bandDirY;
+    const perpY = -this.bandDirX;
+    const glowRadius = this.width * 0.2;
+    const glow = this.ctx.createLinearGradient(
+      glowCenterX - perpX * glowRadius, glowCenterY - perpY * glowRadius,
+      glowCenterX + perpX * glowRadius, glowCenterY + perpY * glowRadius
+    );
+    const glowAlpha = 0.16 * this.rainIntensity;
+    glow.addColorStop(0, 'hsla(230, 80%, 60%, 0)');
+    glow.addColorStop(0.35, `hsla(250, 70%, 60%, ${glowAlpha * 0.5})`);
+    glow.addColorStop(0.5, `hsla(215, 70%, 80%, ${glowAlpha})`);
+    glow.addColorStop(0.65, `hsla(280, 70%, 60%, ${glowAlpha * 0.5})`);
+    glow.addColorStop(1, 'hsla(230, 80%, 60%, 0)');
+    this.ctx.fillStyle = glow;
+    this.ctx.fillRect(0, 0, this.width, this.height);
+
     this.rainDrops.forEach(drop => {
+      const twinkle = 0.65 + 0.35 * Math.sin(seconds * drop.twinkleSpeed + drop.twinklePhase);
+      const alpha = Math.min(1, drop.opacity * this.rainIntensity * twinkle);
+      const headX = this.bandCenterX(drop.y) + drop.offset;
+      const tailX = headX - this.bandDirX * drop.length;
+      const tailY = drop.y - this.bandDirY * drop.length;
+
+      // Halo diffus
       this.ctx.beginPath();
-      this.ctx.moveTo(drop.x, drop.y);
-      this.ctx.lineTo(drop.x + drop.length * 0.25, drop.y + drop.length);
-      this.ctx.strokeStyle = `rgba(190, 220, 235, ${drop.opacity * this.rainIntensity})`;
-      this.ctx.lineWidth = 1;
+      this.ctx.moveTo(tailX, tailY);
+      this.ctx.lineTo(headX, drop.y);
+      this.ctx.strokeStyle = `hsla(${drop.hue}, 90%, 70%, ${alpha * 0.35})`;
+      this.ctx.lineWidth = 5;
+      this.ctx.stroke();
+
+      // Cœur lumineux
+      this.ctx.beginPath();
+      this.ctx.moveTo(tailX, tailY);
+      this.ctx.lineTo(headX, drop.y);
+      this.ctx.strokeStyle = `hsla(${drop.hue}, 80%, ${drop.lightness + 5}%, ${alpha})`;
+      this.ctx.lineWidth = 2;
       this.ctx.stroke();
     });
+
+    this.ctx.restore();
   }
   
   updateParticles() {
