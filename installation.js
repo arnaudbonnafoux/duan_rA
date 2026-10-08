@@ -61,11 +61,14 @@ class AudiovisualInstallation {
       y: this.height * 0.28,
       t: 0,
       baseTilt: -0.35,
-      r,
       tilt: -0.35,
-      particles: Array.from({ length: 140 }, () => ({
+      incl: 0.9,
+      yaw: 0,
+      r,
+      particles: Array.from({ length: 260 }, () => ({
         angle: Math.random() * Math.PI * 2,
-        dist: r * (1.5 + Math.random() * 2.6),
+        dist: r * (1.5 + Math.pow(Math.random(), 1.4) * 3),
+        height: (Math.random() - 0.5) * r * 0.18,
         size: 0.6 + Math.random() * 1.2
       }))
     };
@@ -74,14 +77,15 @@ class AudiovisualInstallation {
   updateBlackHole(deltaTime) {
     const bh = this.blackHole;
     if (!bh) return;
-    // Dérive lente en ellipse et léger balancement du disque
     bh.t += deltaTime;
     bh.x = bh.baseX + Math.sin(bh.t * 0.12) * this.width * 0.04;
     bh.y = bh.baseY + Math.cos(bh.t * 0.09) * this.height * 0.035;
-    bh.tilt = bh.baseTilt + Math.sin(bh.t * 0.2) * 0.12;
+    bh.tilt = bh.baseTilt + Math.sin(bh.t * 0.2) * 0.05;
+    // Le plan du disque est basculé (incl) puis pivote lentement autour de l'axe vertical (yaw)
+    bh.incl = 0.9 + Math.sin(bh.t * 0.04) * 0.2;
+    bh.yaw += deltaTime * 0.025;
     bh.particles.forEach(p => {
-      // Plus près = plus rapide
-      p.angle += deltaTime * 0.9 * Math.pow(bh.r / p.dist, 1.2) * 2;
+      p.angle += deltaTime * 1.8 * Math.pow(bh.r / p.dist, 1.2);
     });
   }
 
@@ -89,12 +93,15 @@ class AudiovisualInstallation {
     const bh = this.blackHole;
     if (!bh) return;
     const ctx = this.ctx;
-    const squash = 0.28;
+    const cosI = Math.cos(bh.incl);
+    const sinI = Math.sin(bh.incl);
+    const cosY = Math.cos(bh.yaw);
+    const sinY = Math.sin(bh.yaw);
+    const focal = bh.r * 14;
     ctx.save();
     ctx.translate(bh.x, bh.y);
     ctx.rotate(bh.tilt);
 
-    // Halo de lentille gravitationnelle
     const halo = ctx.createRadialGradient(0, 0, bh.r, 0, 0, bh.r * 4.5);
     halo.addColorStop(0, 'rgba(255, 170, 90, 0.10)');
     halo.addColorStop(1, 'rgba(255, 170, 90, 0)');
@@ -103,36 +110,59 @@ class AudiovisualInstallation {
     ctx.arc(0, 0, bh.r * 4.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Particules du disque d'accrétion (partie lointaine, derrière l'horizon)
-    ctx.globalCompositeOperation = 'lighter';
-    const drawParticles = back => {
-      bh.particles.forEach(p => {
-        const sin = Math.sin(p.angle);
-        if ((sin < 0) !== back) return;
-        const x = Math.cos(p.angle) * p.dist;
-        const y = sin * p.dist * squash;
-        const heat = 1 - (p.dist - bh.r * 1.5) / (bh.r * 2.6);
-        ctx.fillStyle = `rgba(255, ${Math.round(150 + heat * 90)}, ${Math.round(80 + heat * 150)}, ${0.25 + heat * 0.35})`;
-        ctx.beginPath();
-        ctx.arc(x, y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-      });
+    // Projection 3D : bascule du disque (axe X), pivot (axe Y), puis perspective
+    const project = p => {
+      const x0 = Math.cos(p.angle) * p.dist;
+      const z0 = Math.sin(p.angle) * p.dist;
+      const y1 = p.height * cosI - z0 * sinI;
+      const z1 = p.height * sinI + z0 * cosI;
+      const x2 = x0 * cosY + z1 * sinY;
+      const depth = -x0 * sinY + z1 * cosY; // > 0 : côté proche
+      const persp = focal / (focal - depth);
+      return { x: x2 * persp, y: y1 * persp, depth, persp };
     };
-    drawParticles(true);
+
+    const dot = (x, y, p, q, alpha) => {
+      const heat = 1 - (p.dist - bh.r * 1.5) / (bh.r * 3);
+      // Effet Doppler : côté qui s'approche plus lumineux
+      const doppler = 0.75 + 0.25 * Math.cos(p.angle);
+      ctx.fillStyle = `rgba(255, ${Math.round(150 + heat * 90)}, ${Math.round(80 + heat * 150)}, ${Math.min(1, (0.2 + heat * 0.35) * doppler * alpha)})`;
+      ctx.beginPath();
+      ctx.arc(x, y, p.size * q.persp, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    ctx.globalCompositeOperation = 'lighter';
+    // Moitié lointaine du disque + son image courbée par la lentille gravitationnelle au-dessus de l'horizon
+    bh.particles.forEach(p => {
+      const q = project(p);
+      if (q.depth >= 0) return;
+      dot(q.x, q.y, p, q, 1);
+      const lensY = -(bh.r * 1.12 + (p.dist - bh.r * 1.5) * 0.28) * (0.6 + 0.4 * sinI);
+      dot(q.x * 0.8, lensY, p, q, 0.55);
+    });
     ctx.globalCompositeOperation = 'source-over';
 
-    // Horizon des événements
+    // Disque noir dans le même plan incliné que le disque d'accrétion (ellipse en perspective)
     ctx.fillStyle = '#000';
     ctx.beginPath();
-    ctx.arc(0, 0, bh.r, 0, Math.PI * 2);
+    for (let i = 0; i <= 48; i++) {
+      const q = project({ angle: (i / 48) * Math.PI * 2, dist: bh.r, height: 0 });
+      if (i === 0) ctx.moveTo(q.x, q.y); else ctx.lineTo(q.x, q.y);
+    }
+    ctx.closePath();
     ctx.fill();
     ctx.strokeStyle = 'rgba(255, 200, 140, 0.35)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Partie proche du disque, devant l'horizon
+    // Moitié proche, devant l'horizon
     ctx.globalCompositeOperation = 'lighter';
-    drawParticles(false);
+    bh.particles.forEach(p => {
+      const q = project(p);
+      if (q.depth < 0) return;
+      dot(q.x, q.y, p, q, 1);
+    });
     ctx.restore();
   }
 
