@@ -79,8 +79,18 @@ class AudiovisualInstallation {
     const bh = this.blackHole;
     if (!bh) return;
     bh.t += deltaTime;
-    bh.x = bh.baseX + Math.sin(bh.t * 0.12) * this.width * 0.04;
-    bh.y = bh.baseY + Math.cos(bh.t * 0.09) * this.height * 0.035;
+    // Une fois tout installé, le trou noir glisse lentement vers le cratère du volcan (le désir)
+    const approach = this.blackHoleApproach();
+    const sway = 1 - approach;
+    const swayX = Math.sin(bh.t * 0.12) * this.width * 0.04 * sway;
+    const swayY = Math.cos(bh.t * 0.09) * this.height * 0.035 * sway;
+    const v = this.volcano;
+    const targetX = v ? v.peakX : bh.baseX;
+    // Il grossit en s'approchant : la cible tient compte de sa taille
+    bh.scale = 1 + approach * 1.2;
+    const targetY = v ? v.peakY - bh.r * 1.05 * bh.scale : bh.baseY;
+    bh.x = bh.baseX + (targetX - bh.baseX) * approach + swayX;
+    bh.y = bh.baseY + (targetY - bh.baseY) * approach + swayY;
     bh.tilt = bh.baseTilt + Math.sin(bh.t * 0.2) * 0.05;
     // Le plan du disque est basculé (incl) puis pivote lentement autour de l'axe vertical (yaw)
     bh.incl = 0.9 + Math.sin(bh.t * 0.04) * 0.2;
@@ -88,6 +98,25 @@ class AudiovisualInstallation {
     bh.particles.forEach(p => {
       p.angle += deltaTime * 1.8 * Math.pow(bh.r / p.dist, 1.2);
     });
+  }
+
+  // 0 → 1 → 0 en boucle : approche du volcan, pause, retour à la place d'origine, pause
+  blackHoleApproach() {
+    const ts = this.textState;
+    if (!ts || !ts.isFinished) return 0;
+    const start = ts.entrances.blackHole + ts.entranceFade + 20;
+    const travel = 120; // secondes pour chaque trajet
+    const pause = 15;   // secondes d'immobilité à chaque extrémité
+    const t = ts.finalTime - start;
+    if (t <= 0) return 0;
+    const cycle = (travel + pause) * 2;
+    const c = t % cycle;
+    let x;
+    if (c < travel) x = c / travel;
+    else if (c < travel + pause) x = 1;
+    else if (c < travel * 2 + pause) x = 1 - (c - travel - pause) / travel;
+    else x = 0;
+    return x * x * (3 - 2 * x);
   }
 
   drawBlackHole() {
@@ -102,9 +131,10 @@ class AudiovisualInstallation {
     ctx.save();
     ctx.translate(bh.x, bh.y);
     ctx.rotate(bh.tilt);
+    ctx.scale(bh.scale || 1, bh.scale || 1);
 
     const halo = ctx.createRadialGradient(0, 0, bh.r, 0, 0, bh.r * 4.5);
-    halo.addColorStop(0, 'rgba(255, 170, 90, 0.10)');
+    halo.addColorStop(0, 'rgba(255, 170, 90, 0.04)');
     halo.addColorStop(1, 'rgba(255, 170, 90, 0)');
     ctx.fillStyle = halo;
     ctx.beginPath();
@@ -127,7 +157,7 @@ class AudiovisualInstallation {
       const heat = 1 - (p.dist - bh.r * 1.5) / (bh.r * 3);
       // Effet Doppler : côté qui s'approche plus lumineux
       const doppler = 0.75 + 0.25 * Math.cos(p.angle);
-      ctx.fillStyle = `rgba(255, ${Math.round(150 + heat * 90)}, ${Math.round(80 + heat * 150)}, ${Math.min(1, (0.2 + heat * 0.35) * doppler * alpha)})`;
+      ctx.fillStyle = `rgba(255, ${Math.round(150 + heat * 90)}, ${Math.round(80 + heat * 150)}, ${Math.min(1, (0.12 + heat * 0.21) * doppler * alpha)})`;
       ctx.beginPath();
       ctx.arc(x, y, p.size * q.persp, 0, Math.PI * 2);
       ctx.fill();
@@ -153,7 +183,7 @@ class AudiovisualInstallation {
     }
     ctx.closePath();
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255, 200, 140, 0.35)';
+    ctx.strokeStyle = 'rgba(255, 200, 140, 0.18)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
@@ -272,7 +302,7 @@ class AudiovisualInstallation {
       // Créer 5 oscillateurs avec fréquences basées sur le nombre d'or (φ)
       const baseFreq = 75; // Fréquence de base
       const phi = (1 + Math.sqrt(5)) / 2; // Nombre d'or ≈ 1.618
-      const waveTypes = ['sine', 'triangle', 'triangle', 'sine', 'sine'];
+      const waveTypes = ['sine', 'sine', 'sine', 'sine', 'sine'];
       
       this.oscillators = [];
       this.gains = [];
@@ -343,7 +373,7 @@ class AudiovisualInstallation {
         osc.frequency.value = frequencies[i];
         
         // Gains progressifs mais réduits pour éviter saturation
-        const targetGains = [0.10, 0.08, 0.06, 0.03, 0.015];
+        const targetGains = [0.10, 0.035, 0.015, 0.003, 0.001];
         gain.gain.value = targetGains[i];
         
         osc.connect(gain);
@@ -394,7 +424,10 @@ class AudiovisualInstallation {
     const hatPattern = [0.7, 0.35, 0.55, 0.35, 0.7, 0.35, 0.55, 0.4];
     while (this.nextBeatTime < ctx.currentTime + 0.3) {
       const velocity = pattern[this.beatIndex % pattern.length];
-      if (velocity > 0) this.playDrum(this.nextBeatTime, velocity);
+      if (velocity > 0) {
+        const firstHitVelocity = this.beatIndex === 0 ? velocity * 0.5 : velocity;
+        this.playDrum(this.nextBeatTime, firstHitVelocity);
+      }
       const snareVelocity = snarePattern[this.beatIndex % snarePattern.length];
       if (snareVelocity > 0 && this.allElementsVisible()) this.playSnare(this.nextBeatTime, snareVelocity);
       if (this.allElementsVisible()) this.playHiHat(this.nextBeatTime, hatPattern[this.beatIndex % hatPattern.length]);
@@ -494,8 +527,8 @@ class AudiovisualInstallation {
       const g = ctx.createGain();
       g.gain.value = level;
       osc.type = type;
-      osc.frequency.setValueAtTime(140, time);
-      osc.frequency.exponentialRampToValueAtTime(55, time + 0.2);
+      osc.frequency.setValueAtTime(165, time);
+      osc.frequency.exponentialRampToValueAtTime(65, time + 0.2);
       osc.connect(g);
       g.connect(env);
       osc.start(time);
@@ -505,7 +538,7 @@ class AudiovisualInstallation {
     // Contourne le filtre passe-bas du drone (sinon le son est étouffé), mais garde la réverbération
     const tone = ctx.createBiquadFilter();
     tone.type = 'lowpass';
-    tone.frequency.value = 450;
+    tone.frequency.value = 700;
     env.connect(tone);
     tone.connect(this.dryGain);
     tone.connect(this.wetGain);
@@ -528,7 +561,7 @@ class AudiovisualInstallation {
       this.scheduleDrums();
 
       // Faire dériver les fréquences lentement
-      const drift = Math.sin(this.state.time * 0.0005) * 3; // Dérive légère pour éviter les battements
+      const drift = Math.sin(this.state.time * 0.0005) * 0.5; // Dérive presque imperceptible
       const baseFreq = 75;
       const phi = (1 + Math.sqrt(5)) / 2;
       
@@ -540,11 +573,23 @@ class AudiovisualInstallation {
         baseFreq * Math.pow(phi, 8) * 0.85
       ];
       
+      // De temps en temps, le drone glisse d'un demi-ton vers le bas, puis remonte
+      const now = this.audioContext.currentTime;
+      if (this.nextPitchChange === undefined) {
+        this.pitchLowered = false;
+        this.nextPitchChange = now + 40;
+      }
+      if (now >= this.nextPitchChange) {
+        this.pitchLowered = !this.pitchLowered;
+        this.nextPitchChange = now + (this.pitchLowered ? 50 + Math.random() * 15 : 45 + Math.random() * 30);
+      }
+      const pitchRatio = this.pitchLowered ? Math.pow(2, -1 / 12) : 1;
+
       this.oscillators.forEach((osc, i) => {
         osc.frequency.setTargetAtTime(
-          frequencies[i] + drift,
-          this.audioContext.currentTime,
-          0.1
+          (frequencies[i] + drift) * pitchRatio,
+          now,
+          10
         );
       });
       
@@ -557,12 +602,12 @@ class AudiovisualInstallation {
       
       // Moduler la fréquence de coupure du filtre
       // Variation lente et fluide
-      const filterFreq = 450 + Math.sin(this.state.time * 0.001) * 150 + Math.cos(this.state.time * 0.0008) * 80;
+      const filterFreq = 400 + Math.sin(this.state.time * 0.001) * 100 + Math.cos(this.state.time * 0.0008) * 50;
       if (this.filter) {
         this.filter.frequency.setTargetAtTime(
-          Math.max(250, Math.min(900, filterFreq)),
+          Math.max(250, Math.min(600, filterFreq)),
           this.audioContext.currentTime,
-          0.05
+          0.3
         );
       }
       
@@ -777,7 +822,7 @@ class AudiovisualInstallation {
         }
         
         this.trails[index].forEach((point, i) => {
-          const alpha = (i / this.trails[index].length) * 0.15;
+          const alpha = (i / this.trails[index].length) * 0.09;
           this.ctx.fillStyle = `hsla(${hue}, 80%, 50%, ${alpha})`;
           this.ctx.beginPath();
           this.ctx.arc(point.x, point.y, pulsingRadius * 0.5, 0, Math.PI * 2);
@@ -787,8 +832,8 @@ class AudiovisualInstallation {
       
       // Cercle interne lumineux
       const innerGradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, pulsingRadius);
-      innerGradient.addColorStop(0, `hsla(${hue}, 100%, 60%, 0.6)`);
-      innerGradient.addColorStop(1, `hsla(${hue}, 100%, 40%, 0.1)`);
+      innerGradient.addColorStop(0, `hsla(${hue}, 85%, 52%, 0.36)`);
+      innerGradient.addColorStop(1, `hsla(${hue}, 85%, 38%, 0.06)`);
       
       this.ctx.fillStyle = innerGradient;
       this.ctx.beginPath();
@@ -796,7 +841,7 @@ class AudiovisualInstallation {
       this.ctx.fill();
       
       // Contour fin
-      this.ctx.strokeStyle = `hsla(${hue}, 100%, 70%, 0.4)`;
+      this.ctx.strokeStyle = `hsla(${hue}, 85%, 62%, 0.24)`;
       this.ctx.lineWidth = 2;
       this.ctx.stroke();
     });
