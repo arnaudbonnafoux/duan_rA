@@ -717,9 +717,9 @@ class AudiovisualInstallation {
   
   // =================== SYSTÈME DE RÉVÉLATION DU TEXTE ===================
   
-  setupText() {
-    this.textState = {
-      // Les 5 phrases poétiques de l'installation
+  // Textes de l'installation par langue (français par défaut)
+  static TEXTS = {
+    fr: {
       phrases: [
         "Le Cyclope n'est pas tué.",
         "Son œil n'est plus.",
@@ -727,15 +727,97 @@ class AudiovisualInstallation {
         "Le centre disparaît.",
         "Le multiple révèle la conscience."
       ],
-      
-      // Retour du texte, réécrit avec des concepts de la psychanalyse
       returnPhrases: [
         "Ce qui regarde n'est jamais ce que l'on voit.",
         "L'œil s'éteint, le regard demeure.",
         "Le miroir se brise : chaque éclat se reconnaît.",
         "Ce que l'on refuse d'être attend, patient, au bord de la lumière.",
         "Au centre vide, le manque se met à chanter."
+      ]
+    },
+    en: {
+      phrases: [
+        "The Cyclops is not slain.",
+        "His eye is no more.",
+        "His vision becomes resonance.",
+        "The center vanishes.",
+        "The multiple reveals consciousness."
       ],
+      returnPhrases: [
+        "What looks is never what we see.",
+        "The eye goes dark, the gaze remains.",
+        "The mirror shatters: each shard recognizes itself.",
+        "What we refuse to be waits, patient, at the edge of the light.",
+        "At the empty center, lack begins to sing."
+      ]
+    },
+    es: {
+      phrases: [
+        "El Cíclope no ha sido muerto.",
+        "Su ojo ya no es.",
+        "Su visión se convierte en resonancia.",
+        "El centro desaparece.",
+        "Lo múltiple revela la conciencia."
+      ],
+      returnPhrases: [
+        "Lo que mira nunca es lo que vemos.",
+        "El ojo se apaga, la mirada permanece.",
+        "El espejo se rompe: cada fragmento se reconoce.",
+        "Lo que nos negamos a ser espera, paciente, al borde de la luz.",
+        "En el centro vacío, la falta comienza a cantar."
+      ]
+    },
+    de: {
+      phrases: [
+        "Der Kyklop ist nicht getötet.",
+        "Sein Auge ist nicht mehr.",
+        "Sein Blick wird zu Resonanz.",
+        "Das Zentrum verschwindet.",
+        "Das Vielfache offenbart das Bewusstsein."
+      ],
+      returnPhrases: [
+        "Was blickt, ist nie das, was wir sehen.",
+        "Das Auge erlischt, der Blick bleibt.",
+        "Der Spiegel zerbricht: jede Scherbe erkennt sich.",
+        "Was wir nicht sein wollen, wartet geduldig am Rand des Lichts.",
+        "Im leeren Zentrum beginnt der Mangel zu singen."
+      ]
+    },
+    it: {
+      phrases: [
+        "Il Ciclope non è ucciso.",
+        "Il suo occhio non è più.",
+        "La sua visione diventa risonanza.",
+        "Il centro scompare.",
+        "Il molteplice rivela la coscienza."
+      ],
+      returnPhrases: [
+        "Ciò che guarda non è mai ciò che vediamo.",
+        "L'occhio si spegne, lo sguardo resta.",
+        "Lo specchio si frantuma: ogni frammento si riconosce.",
+        "Ciò che rifiutiamo di essere attende, paziente, al margine della luce.",
+        "Nel centro vuoto, la mancanza comincia a cantare."
+      ]
+    }
+  };
+
+  // Langue du navigateur parmi celles disponibles, sinon français
+  detectTextLanguage() {
+    const langs = navigator.languages && navigator.languages.length
+      ? navigator.languages
+      : [navigator.language || 'fr'];
+    for (const l of langs) {
+      const code = String(l).slice(0, 2).toLowerCase();
+      if (AudiovisualInstallation.TEXTS[code]) return code;
+    }
+    return 'fr';
+  }
+
+  setupText() {
+    const texts = AudiovisualInstallation.TEXTS[this.detectTextLanguage()];
+    this.textState = {
+      phrases: texts.phrases,
+      returnPhrases: texts.returnPhrases,
       returnGapFrames: 900,  // 15 secondes de silence avant le retour
       
       // Timing : 15 secondes d'affichage total
