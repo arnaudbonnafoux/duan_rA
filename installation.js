@@ -799,8 +799,14 @@ class AudiovisualInstallation {
     }
     
     // Configuration du texte
-    const fontSize = Math.min(48, this.width / 20);
+    // Taille limitée par la hauteur, puis réduite pour que la plus longue phrase tienne dans 90 % de la largeur
+    let fontSize = Math.min(48, this.width / 20, this.height / 16);
     this.ctx.font = `bold ${fontSize}px Georgia, serif`;
+    const widest = Math.max(...phrases.map(ph => this.ctx.measureText(ph).width));
+    if (widest > this.width * 0.9) {
+      fontSize *= (this.width * 0.9) / widest;
+      this.ctx.font = `bold ${fontSize}px Georgia, serif`;
+    }
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     
