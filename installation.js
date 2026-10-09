@@ -389,11 +389,14 @@ class AudiovisualInstallation {
     const pattern = [1, 0, 0.45, 0, 0.8, 0, 0.45, 0.3];
     // Caisse claire légère sur les temps 2 et 4, avec une ghost note discrète
     const snarePattern = [0, 0, 1, 0, 0, 0, 1, 0.25];
+    // Charleston en croches, accentué sur les temps forts
+    const hatPattern = [0.7, 0.35, 0.55, 0.35, 0.7, 0.35, 0.55, 0.4];
     while (this.nextBeatTime < ctx.currentTime + 0.3) {
       const velocity = pattern[this.beatIndex % pattern.length];
       if (velocity > 0) this.playDrum(this.nextBeatTime, velocity);
       const snareVelocity = snarePattern[this.beatIndex % snarePattern.length];
       if (snareVelocity > 0 && this.allElementsVisible()) this.playSnare(this.nextBeatTime, snareVelocity);
+      if (this.allElementsVisible()) this.playHiHat(this.nextBeatTime, hatPattern[this.beatIndex % hatPattern.length]);
       this.nextBeatTime += stepDuration;
       this.beatIndex++;
     }
@@ -405,14 +408,39 @@ class AudiovisualInstallation {
     return !ts || (ts.isFinished && ts.finalTime >= ts.entrances.blackHole + ts.entranceFade);
   }
 
+  ensureNoiseBuffer() {
+    if (this.noiseBuffer) return;
+    const ctx = this.audioContext;
+    const length = Math.floor(ctx.sampleRate * 0.3);
+    this.noiseBuffer = ctx.createBuffer(1, length, ctx.sampleRate);
+    const data = this.noiseBuffer.getChannelData(0);
+    for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
+  }
+
+  // Charleston fermé très léger : bruit aigu et très bref
+  playHiHat(time, velocity) {
+    const ctx = this.audioContext;
+    this.ensureNoiseBuffer();
+    const noise = ctx.createBufferSource();
+    noise.buffer = this.noiseBuffer;
+    const high = ctx.createBiquadFilter();
+    high.type = 'highpass';
+    high.frequency.value = 6500;
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, time);
+    env.gain.exponentialRampToValueAtTime(0.035 * velocity, time + 0.002);
+    env.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
+    noise.connect(high);
+    high.connect(env);
+    env.connect(this.dryGain);
+    env.connect(this.wetGain);
+    noise.start(time);
+    noise.stop(time + 0.07);
+  }
+
   playSnare(time, velocity) {
     const ctx = this.audioContext;
-    if (!this.noiseBuffer) {
-      const length = Math.floor(ctx.sampleRate * 0.3);
-      this.noiseBuffer = ctx.createBuffer(1, length, ctx.sampleRate);
-      const data = this.noiseBuffer.getChannelData(0);
-      for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
-    }
+    this.ensureNoiseBuffer();
 
     // Souffle : bruit filtré, court
     const noise = ctx.createBufferSource();
