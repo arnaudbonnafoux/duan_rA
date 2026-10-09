@@ -437,13 +437,105 @@ function closeModal() {
 const tabInstallation = document.getElementById('tabInstallation');
 const installationOverlay = document.getElementById('installationOverlay');
 const installationCloseBtn = document.getElementById('installationCloseBtn');
+const installationLandscapeBtn = document.getElementById('installationLandscapeBtn');
 const installationCanvas = document.getElementById('installationCanvas');
+let installationLandscapeActive = false;
+let installationControlsTimeout;
+const isSmartphone = Boolean(
+  navigator.userAgentData?.mobile ||
+  (
+    window.matchMedia('(pointer: coarse)').matches &&
+    Math.min(screen.width, screen.height) <= 600
+  )
+);
+
+if (isSmartphone && installationOverlay) {
+  installationOverlay.classList.add('mobile-device');
+}
+
+function showInstallationControls() {
+  if (!installationOverlay) return;
+  installationOverlay.classList.add('mobile-controls-visible');
+  window.clearTimeout(installationControlsTimeout);
+  installationControlsTimeout = window.setTimeout(() => {
+    installationOverlay.classList.remove('mobile-controls-visible');
+  }, 2500);
+}
+
+if (isSmartphone && installationOverlay) {
+  installationOverlay.addEventListener('pointerdown', showInstallationControls);
+  installationOverlay.addEventListener('keydown', showInstallationControls);
+}
 
 if (tabInstallation) {
   tabInstallation.addEventListener('click', () => {
     openInstallationModal();
   });
 }
+
+function updateInstallationLandscapeButton() {
+  if (!installationLandscapeBtn) return;
+  installationLandscapeBtn.setAttribute('aria-pressed', String(installationLandscapeActive));
+  installationLandscapeBtn.textContent = installationLandscapeActive
+    ? 'Quitter le plein écran'
+    : 'Plein écran paysage';
+}
+
+async function toggleInstallationLandscape() {
+  if (!installationOverlay || !installationLandscapeBtn) return;
+
+  if (installationLandscapeActive) {
+    installationLandscapeActive = false;
+    installationOverlay.classList.remove('mobile-landscape');
+    installationOverlay.classList.remove('mobile-controls-visible');
+    window.clearTimeout(installationControlsTimeout);
+    if (screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+    if (document.fullscreenElement === installationOverlay && document.exitFullscreen) {
+      await document.exitFullscreen();
+    }
+    updateInstallationLandscapeButton();
+    window.dispatchEvent(new Event('resize'));
+    return;
+  }
+
+  try {
+    if (installationOverlay.requestFullscreen) {
+      await installationOverlay.requestFullscreen();
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape');
+      }
+    }
+  } catch (error) {
+    console.info('Plein écran paysage natif indisponible, activation du mode adapté.', error);
+  }
+
+  installationLandscapeActive = true;
+  installationOverlay.classList.add('mobile-landscape');
+  showInstallationControls();
+  updateInstallationLandscapeButton();
+  window.dispatchEvent(new Event('resize'));
+}
+
+if (installationLandscapeBtn) {
+  installationLandscapeBtn.addEventListener('click', () => {
+    toggleInstallationLandscape().catch(error => {
+      console.warn('Impossible de modifier l’affichage paysage de Cyclops Sonoris :', error);
+    });
+  });
+}
+
+document.addEventListener('fullscreenchange', () => {
+  if (installationLandscapeActive && document.fullscreenElement !== installationOverlay) {
+    installationLandscapeActive = false;
+    installationOverlay.classList.remove('mobile-landscape');
+    installationOverlay.classList.remove('mobile-controls-visible');
+    window.clearTimeout(installationControlsTimeout);
+    updateInstallationLandscapeButton();
+    window.dispatchEvent(new Event('resize'));
+  }
+});
 
 // EXHIBITION MODE - Aucun contrôle de fermeture pour l'installation Cyclops Sonoris
 // Le bouton de fermeture est caché en CSS (display: none)

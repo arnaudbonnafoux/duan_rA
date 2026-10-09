@@ -1189,6 +1189,54 @@ body.dark-mode .page-container h1 {
   display: block;
 }
 
+.installation-overlay.mobile-device .installation-landscape-btn {
+  display: block;
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 2;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.installation-overlay.mobile-device.mobile-controls-visible .installation-landscape-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.installation-landscape-btn {
+  display: none;
+}
+
+.installation-landscape-btn:focus-visible {
+  outline: 2px solid #87ceeb;
+  outline-offset: 2px;
+}
+
+@media (orientation: portrait) {
+  .installation-overlay.mobile-device.mobile-landscape .installation-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100vh;
+    width: 100dvh;
+    height: 100vw;
+    height: 100dvw;
+    transform: translate(-50%, -50%) rotate(90deg);
+    transform-origin: center;
+  }
+}
+
 .installation-close-btn {
   display: none;
 }
