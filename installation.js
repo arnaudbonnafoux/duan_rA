@@ -30,6 +30,7 @@ class AudiovisualInstallation {
     this.setupText();
     
     // Initialiser animation
+    this.isSmartphone = window.matchMedia('(pointer: coarse) and (max-width: 600px)').matches;
     this.particles = this.createParticles(30); // Augmenté de 15 à 30
     this.trails = this.particles.map(() => []); // Tracer les positions passées
     this.animationId = null;
@@ -598,11 +599,12 @@ class AudiovisualInstallation {
   
   createParticles(count) {
     const particles = [];
+    const radiusScale = this.isSmartphone ? 0.55 : 1;
     for (let i = 0; i < count; i++) {
       particles.push({
         x: Math.random() * this.width,
         y: Math.random() * this.height,
-        radius: Math.random() * 20 + 15,      // Réduit de 30 + 20 à 20 + 15
+        radius: (Math.random() * 20 + 15) * radiusScale,
         speedX: (Math.random() - 0.5) * 0.8,
         speedY: (Math.random() - 0.5) * 0.8,
         hueOffset: (i / count) * 360
