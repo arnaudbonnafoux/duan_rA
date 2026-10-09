@@ -1189,7 +1189,8 @@ body.dark-mode .page-container h1 {
   display: block;
 }
 
-.installation-overlay.mobile-device .installation-landscape-btn {
+.installation-overlay.mobile-device .installation-landscape-btn,
+.installation-overlay.mobile-device .installation-close-btn {
   display: block;
   position: absolute;
   top: max(12px, env(safe-area-inset-top));
@@ -1209,9 +1210,19 @@ body.dark-mode .page-container h1 {
   transition: opacity 180ms ease;
 }
 
-.installation-overlay.mobile-device.mobile-controls-visible .installation-landscape-btn {
+.installation-overlay.mobile-device.mobile-controls-visible .installation-landscape-btn,
+.installation-overlay.mobile-device.mobile-controls-visible .installation-close-btn {
   opacity: 1;
   pointer-events: auto;
+}
+
+.installation-overlay.mobile-device .installation-close-btn,
+.installation-overlay.mobile-device .installation-close-btn:hover {
+  right: auto;
+  left: max(12px, env(safe-area-inset-left));
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: none;
+  transform: none;
 }
 
 .installation-landscape-btn {

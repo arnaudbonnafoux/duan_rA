@@ -537,6 +537,20 @@ document.addEventListener('fullscreenchange', () => {
   }
 });
 
+// Smartphone : le bouton « Quitter » (visible au toucher) ferme l'installation
+if (isSmartphone && installationCloseBtn) {
+  installationCloseBtn.addEventListener('click', async () => {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      try { await document.exitFullscreen(); } catch (e) { /* ignoré */ }
+    }
+    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+    installationLandscapeActive = false;
+    installationOverlay.classList.remove('mobile-landscape', 'mobile-controls-visible');
+    window.clearTimeout(installationControlsTimeout);
+    closeInstallationModal();
+  });
+}
+
 // EXHIBITION MODE - Aucun contrôle de fermeture pour l'installation Cyclops Sonoris
 // Le bouton de fermeture est caché en CSS (display: none)
 // Les méthodes de fermeture (Escape, clic fond) sont désactivées
