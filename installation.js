@@ -320,6 +320,9 @@ class AudiovisualInstallation {
       this.filter = this.audioContext.createBiquadFilter();
       this.filter.type = 'lowpass';
       this.filter.frequency.value = 700; // Coupure plus basse : son plus doux
+      // Gain du drone seul : coupé quand le trou noir est à la verticale du volcan
+      this.droneGain = this.audioContext.createGain();
+      this.droneGain.connect(this.filter);
       this.filter.Q.value = 0.4;
       
       // Créer une reverb avec des delays et feedback
@@ -377,7 +380,7 @@ class AudiovisualInstallation {
         gain.gain.value = targetGains[i];
         
         osc.connect(gain);
-        gain.connect(this.filter);
+        gain.connect(this.droneGain);
         
         // Connecter le LFO pour moduler le volume
         this.lfoGain.connect(gain.gain);
@@ -559,6 +562,15 @@ class AudiovisualInstallation {
       this.masterGain.gain.value = fadeProgress;
       
       this.scheduleDrums();
+
+      // Le drone s'arrête quand le trou noir est à la verticale du volcan, puis revient en fondu
+      const aligned = this.blackHoleApproach() > 0.97;
+      if (aligned !== this.droneMuted) {
+        this.droneMuted = aligned;
+        const t = this.audioContext.currentTime;
+        this.droneGain.gain.cancelScheduledValues(t);
+        this.droneGain.gain.setTargetAtTime(aligned ? 0 : 1, t, aligned ? 1.5 : 4);
+      }
 
       // Faire dériver les fréquences lentement
       const drift = Math.sin(this.state.time * 0.0005) * 0.5; // Dérive presque imperceptible
@@ -789,7 +801,6 @@ class AudiovisualInstallation {
     this.ctx.globalAlpha = 1.0;
     this.drawWithEntrance('volcano', () => this.drawVolcano());
     this.drawWithEntrance('rain', () => this.drawRain());
-    this.drawWithEntrance('blackHole', () => this.drawBlackHole());
     
     // Dessiner les lignes de connexion entre les sphères (blanc)
     this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
@@ -845,6 +856,9 @@ class AudiovisualInstallation {
       this.ctx.lineWidth = 2;
       this.ctx.stroke();
     });
+
+    // Le trou noir passe devant les sphères et leurs liens
+    this.drawWithEntrance('blackHole', () => this.drawBlackHole());
   }
   
   // =================== SYSTÈME DE RÉVÉLATION DU TEXTE ===================
