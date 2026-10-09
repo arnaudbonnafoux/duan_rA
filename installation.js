@@ -378,8 +378,8 @@ class AudiovisualInstallation {
   // Planifie en avance les frappes de tambour sur l'horloge audio
   scheduleDrums() {
     const ctx = this.audioContext;
-    // Le tambour arrive quand le texte a disparu
-    if (this.textState && !this.textState.isComplete) return;
+    // Le tambour arrive quand le second texte a disparu
+    if (this.textState && !this.textState.isFinished) return;
     if (this.nextBeatTime === undefined) {
       this.nextBeatTime = ctx.currentTime + 0.5;
       this.beatIndex = 0;
@@ -655,9 +655,9 @@ class AudiovisualInstallation {
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     this.ctx.fillRect(0, 0, this.width, this.height);
     this.ctx.globalAlpha = 1.0;
-    this.drawVolcano();
-    this.drawRain();
-    this.drawBlackHole();
+    this.drawWithEntrance('volcano', () => this.drawVolcano());
+    this.drawWithEntrance('rain', () => this.drawRain());
+    this.drawWithEntrance('blackHole', () => this.drawBlackHole());
     
     // Dessiner les lignes de connexion entre les sphères (blanc)
     this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
@@ -745,7 +745,12 @@ class AudiovisualInstallation {
       // État courant
       frameCounter: 0,
       isDisplaying: false,
-      isComplete: false
+      isComplete: false,
+      isFinished: false,  // second texte terminé
+      finalTime: 0,       // secondes écoulées depuis la fin du second texte
+      // Entrée échelonnée des éléments graphiques (secondes après la fin du second texte)
+      entrances: { rain: 8, volcano: 22, blackHole: 36 },
+      entranceFade: 10
     };
   }
   
@@ -769,6 +774,28 @@ class AudiovisualInstallation {
       ts.isDisplaying = false;
       ts.isComplete = true;
     }
+    if (framesSinceDelay > ts.displayDuration * 2 + ts.returnGapFrames) {
+      ts.isFinished = true;
+    }
+  }
+
+  // Opacité (0 → 1) d'un élément graphique selon son délai d'entrée
+  entranceAlpha(name) {
+    const ts = this.textState;
+    if (!ts) return 1;
+    if (!ts.isFinished) return 0;
+    const t = (ts.finalTime - ts.entrances[name]) / ts.entranceFade;
+    const x = Math.min(1, Math.max(0, t));
+    return x * x * (3 - 2 * x);
+  }
+
+  drawWithEntrance(name, drawFn) {
+    const alpha = this.entranceAlpha(name);
+    if (alpha <= 0) return;
+    this.ctx.save();
+    this.ctx.globalAlpha = alpha;
+    drawFn();
+    this.ctx.restore();
   }
   
   drawText() {
@@ -853,6 +880,7 @@ class AudiovisualInstallation {
     this.updateBlackHole(deltaTime);
     this.updateParticles();
     this.updateText();
+    if (this.textState && this.textState.isFinished) this.textState.finalTime += deltaTime;
     this.draw();
     this.drawText();
     
