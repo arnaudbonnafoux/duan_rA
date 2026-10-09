@@ -1251,3 +1251,23 @@ body.dark-mode .page-container h1 {
   outline: 2px solid #87ceeb;
   outline-offset: 2px;
 }
+
+.artist-signup-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.artist-signup label.artist-signup-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  grid-column: 1 / -1;
+}
+
+.artist-signup label.artist-signup-consent input {
+  width: auto;
+  margin-top: 0.25rem;
+}

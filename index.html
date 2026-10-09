@@ -93,20 +93,26 @@
                 <input type="hidden" name="_subject" value="Nouvelle candidature pour rejoindre duan rA">
                 <div class="artist-signup-fields">
                     <label>
-                        Votre nom
-                        <input type="text" name="name" autocomplete="name" required>
+                        Nom d'artiste
+                        <input type="text" name="name" autocomplete="off" maxlength="100" placeholder="Un nom spécifique à ce projet, à créer pour collaborer" required>
+                        <small>Ce nom doit être propre au projet : crée-en un nouveau pour collaborer avec nous.</small>
                     </label>
                     <label>
                         Votre adresse e-mail
-                        <input type="email" name="email" autocomplete="email" required>
+                        <input type="email" name="email" autocomplete="email" maxlength="254" required>
                     </label>
                     <label>
                         Votre pratique artistique
-                        <input type="text" name="practice" placeholder="Musique, arts visuels, création web…">
+                        <input type="text" name="practice" maxlength="150" placeholder="Musique, arts visuels, création web…">
                     </label>
                     <label>
                         Quelques mots sur vous et votre envie de nous rejoindre
-                        <textarea name="message" rows="5" required></textarea>
+                        <textarea name="message" rows="5" maxlength="3000" required></textarea>
+                    </label>
+                    <input type="text" name="_gotcha" class="artist-signup-trap" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <label class="artist-signup-consent">
+                        <input type="checkbox" name="consent" required>
+                        J'accepte que ces informations soient transmises au projet duan rA (via Formspree) pour répondre à ma proposition. Voir les <a href="mentions_légales.html">mentions légales</a>.
                     </label>
                 </div>
                 <button type="submit">Envoyer ma proposition</button>
