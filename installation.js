@@ -271,7 +271,7 @@ class AudiovisualInstallation {
       // Créer 5 oscillateurs avec fréquences basées sur le nombre d'or (φ)
       const baseFreq = 75; // Fréquence de base
       const phi = (1 + Math.sqrt(5)) / 2; // Nombre d'or ≈ 1.618
-      const waveTypes = ['sine', 'sawtooth', 'sawtooth', 'triangle', 'triangle'];
+      const waveTypes = ['sine', 'triangle', 'triangle', 'sine', 'sine'];
       
       this.oscillators = [];
       this.gains = [];
@@ -288,8 +288,8 @@ class AudiovisualInstallation {
       // Créer un filtre lowpass pour moduler le timbre
       this.filter = this.audioContext.createBiquadFilter();
       this.filter.type = 'lowpass';
-      this.filter.frequency.value = 1200; // Fréquence de coupure augmentée (moins grave)
-      this.filter.Q.value = 1;
+      this.filter.frequency.value = 700; // Coupure plus basse : son plus doux
+      this.filter.Q.value = 0.4;
       
       // Créer une reverb avec des delays et feedback
       this.dryGain = this.audioContext.createGain();
@@ -342,7 +342,7 @@ class AudiovisualInstallation {
         osc.frequency.value = frequencies[i];
         
         // Gains progressifs mais réduits pour éviter saturation
-        const targetGains = [0.05, 0.06, 0.10, 0.12, 0.15];
+        const targetGains = [0.10, 0.08, 0.06, 0.03, 0.015];
         gain.gain.value = targetGains[i];
         
         osc.connect(gain);
@@ -387,12 +387,69 @@ class AudiovisualInstallation {
     const stepDuration = 0.5; // Croche à 60 BPM : pulsation lente
     // Motif de 8 pas : 0 = silence, sinon intensité (tambour grave, ternaire discret)
     const pattern = [1, 0, 0.45, 0, 0.8, 0, 0.45, 0.3];
+    // Caisse claire légère sur les temps 2 et 4, avec une ghost note discrète
+    const snarePattern = [0, 0, 1, 0, 0, 0, 1, 0.25];
     while (this.nextBeatTime < ctx.currentTime + 0.3) {
       const velocity = pattern[this.beatIndex % pattern.length];
       if (velocity > 0) this.playDrum(this.nextBeatTime, velocity);
+      const snareVelocity = snarePattern[this.beatIndex % snarePattern.length];
+      if (snareVelocity > 0 && this.allElementsVisible()) this.playSnare(this.nextBeatTime, snareVelocity);
       this.nextBeatTime += stepDuration;
       this.beatIndex++;
     }
+  }
+
+  // Vrai quand le dernier élément graphique (trou noir) est entièrement apparu
+  allElementsVisible() {
+    const ts = this.textState;
+    return !ts || (ts.isFinished && ts.finalTime >= ts.entrances.blackHole + ts.entranceFade);
+  }
+
+  playSnare(time, velocity) {
+    const ctx = this.audioContext;
+    if (!this.noiseBuffer) {
+      const length = Math.floor(ctx.sampleRate * 0.3);
+      this.noiseBuffer = ctx.createBuffer(1, length, ctx.sampleRate);
+      const data = this.noiseBuffer.getChannelData(0);
+      for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
+    }
+
+    // Souffle : bruit filtré, court
+    const noise = ctx.createBufferSource();
+    noise.buffer = this.noiseBuffer;
+    const band = ctx.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.value = 1800;
+    band.Q.value = 0.6;
+    const noiseEnv = ctx.createGain();
+    noiseEnv.gain.setValueAtTime(0.0001, time);
+    noiseEnv.gain.exponentialRampToValueAtTime(0.11 * velocity, time + 0.004);
+    noiseEnv.gain.exponentialRampToValueAtTime(0.0001, time + 0.18);
+    noise.connect(band);
+    band.connect(noiseEnv);
+
+    // Corps : petit sinus qui descend
+    const body = ctx.createOscillator();
+    body.type = 'sine';
+    body.frequency.setValueAtTime(220, time);
+    body.frequency.exponentialRampToValueAtTime(150, time + 0.08);
+    const bodyEnv = ctx.createGain();
+    bodyEnv.gain.setValueAtTime(0.0001, time);
+    bodyEnv.gain.exponentialRampToValueAtTime(0.08 * velocity, time + 0.003);
+    bodyEnv.gain.exponentialRampToValueAtTime(0.0001, time + 0.12);
+    body.connect(bodyEnv);
+
+    // Même chemin que le tambour : hors filtre du drone, avec réverbération
+    const out = ctx.createGain();
+    noiseEnv.connect(out);
+    bodyEnv.connect(out);
+    out.connect(this.dryGain);
+    out.connect(this.wetGain);
+
+    noise.start(time);
+    noise.stop(time + 0.2);
+    body.start(time);
+    body.stop(time + 0.15);
   }
 
   playDrum(time, velocity) {
@@ -442,8 +499,8 @@ class AudiovisualInstallation {
       this.scheduleDrums();
 
       // Faire dériver les fréquences lentement
-      const drift = Math.sin(this.state.time * 0.0005) * 15; // Drift réduit
-      const baseFreq = 95;
+      const drift = Math.sin(this.state.time * 0.0005) * 3; // Dérive légère pour éviter les battements
+      const baseFreq = 75;
       const phi = (1 + Math.sqrt(5)) / 2;
       
       const frequencies = [
@@ -471,10 +528,10 @@ class AudiovisualInstallation {
       
       // Moduler la fréquence de coupure du filtre
       // Variation lente et fluide
-      const filterFreq = 600 + Math.sin(this.state.time * 0.001) * 300 + Math.cos(this.state.time * 0.0008) * 150;
+      const filterFreq = 450 + Math.sin(this.state.time * 0.001) * 150 + Math.cos(this.state.time * 0.0008) * 80;
       if (this.filter) {
         this.filter.frequency.setTargetAtTime(
-          Math.max(300, Math.min(1800, filterFreq)),
+          Math.max(250, Math.min(900, filterFreq)),
           this.audioContext.currentTime,
           0.05
         );
@@ -482,7 +539,7 @@ class AudiovisualInstallation {
       
       // Variation d'énergie pour l'animation
       this.state.energy = Math.sin(this.state.time * 0.001) * 0.5 + 0.5;
-      this.state.drift = drift / 20; // Normaliser pour l'animation
+      this.state.drift = drift / 4; // Normaliser pour l'animation
     } catch (e) {
       console.warn('Erreur updateAudio:', e);
     }
