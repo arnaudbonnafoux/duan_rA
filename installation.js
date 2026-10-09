@@ -728,6 +728,16 @@ class AudiovisualInstallation {
         "Le multiple révèle la conscience."
       ],
       
+      // Retour du texte, réécrit avec des concepts de la psychanalyse
+      returnPhrases: [
+        "Ce qui regarde n'est jamais ce que l'on voit.",
+        "L'œil s'éteint, le regard demeure.",
+        "Le miroir se brise : chaque éclat se reconnaît.",
+        "Ce que l'on refuse d'être attend, patient, au bord de la lumière.",
+        "Au centre vide, le manque se met à chanter."
+      ],
+      returnGapFrames: 900,  // 15 secondes de silence avant le retour
+      
       // Timing : 15 secondes d'affichage total
       displayDuration: 2700,  // 45 secondes (2700 frames à 60fps)
       initialDelayFrames: 360,  // Délai initial de 6 secondes avant affichage
@@ -769,15 +779,22 @@ class AudiovisualInstallation {
     // Vérifier si le texte est hors plage ou complet
     if (ts.frameCounter < ts.initialDelayFrames) return;
     const framesSinceDelay = ts.frameCounter - ts.initialDelayFrames;
-    if (framesSinceDelay > ts.displayDuration) return; // Texte disparu
+    let phrases = ts.phrases;
+    let localFrame = framesSinceDelay;
+    if (framesSinceDelay > ts.displayDuration) {
+      // Premier texte disparu : attendre, puis afficher la version psychanalytique
+      localFrame = framesSinceDelay - ts.displayDuration - ts.returnGapFrames;
+      if (localFrame < 0 || localFrame > ts.displayDuration) return;
+      phrases = ts.returnPhrases;
+    }
     
     this.ctx.save();
     
     // Calculer l'opacité (fade out les 3 dernières secondes : 180 frames)
     const fadeOutStart = ts.displayDuration - 180; // 27 sec
     let opacity = 1;
-    if (framesSinceDelay > fadeOutStart) {
-      const fadeProgress = (framesSinceDelay - fadeOutStart) / 180;
+    if (localFrame > fadeOutStart) {
+      const fadeProgress = (localFrame - fadeOutStart) / 180;
       opacity = Math.max(0, 1 - fadeProgress);
     }
     
@@ -797,9 +814,9 @@ class AudiovisualInstallation {
     // Apparition progressive : chaque phrase s'estompe 6 s après la précédente
     const fadeInFrames = 600;
     const fadeInStagger = 360;
-    ts.phrases.forEach((phrase, index) => {
+    phrases.forEach((phrase, index) => {
       const yPos = startY + (index * lineSpacing);
-      const linearIn = Math.min(1, Math.max(0, (framesSinceDelay - index * fadeInStagger) / fadeInFrames));
+      const linearIn = Math.min(1, Math.max(0, (localFrame - index * fadeInStagger) / fadeInFrames));
       const fadeIn = linearIn * linearIn * (3 - 2 * linearIn); // smoothstep
       const phraseOpacity = opacity * fadeIn;
       if (phraseOpacity <= 0) return;
