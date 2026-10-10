@@ -5,6 +5,9 @@ class AudiovisualInstallation {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.isSmartphone = window.matchMedia('(pointer: coarse) and (max-width: 600px)').matches;
+    this.renderQuality = this.isSmartphone ? 0.65 : 1;
+    this.frameTimeAverage = 1 / 60;
     
     // Cycle de la pluie (apparition/disparition) : état initialisé avant le premier resize
     this.rainCyclePeriod = 40; // secondes pour un cycle complet
@@ -30,8 +33,7 @@ class AudiovisualInstallation {
     this.setupText();
     
     // Initialiser animation
-    this.isSmartphone = window.matchMedia('(pointer: coarse) and (max-width: 600px)').matches;
-    this.particles = this.createParticles(30); // Augmenté de 15 à 30
+    this.particles = this.createParticles(this.isSmartphone ? 20 : 30);
     this.trails = this.particles.map(() => []); // Tracer les positions passées
     this.animationId = null;
     
@@ -671,7 +673,8 @@ class AudiovisualInstallation {
   }
 
   createRainDrops() {
-    const count = Math.min(1200, Math.max(300, Math.round(this.width * this.height / 2200)));
+    const maxCount = this.isSmartphone ? 500 : 1200;
+    const count = Math.min(maxCount, Math.max(300, Math.round(this.width * this.height / 2200)));
     const gaussian = () => {
       const u = 1 - Math.random();
       return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random());
@@ -774,11 +777,12 @@ class AudiovisualInstallation {
     this.ctx.restore();
   }
   
-  updateParticles() {
+  updateParticles(deltaTime = 1 / 60) {
+    const frameScale = deltaTime * 60;
     this.particles.forEach(p => {
       // Mouvement plus lent influencé par l'énergie audio
       // Multiplicateur: 0.3 (idle) → 6.3 (full drone energy)
-      const speedMultiplier = 0.3 + (this.state.energy * 6);
+      const speedMultiplier = (0.3 + (this.state.energy * 6)) * frameScale;
       p.x += p.speedX * speedMultiplier;
       p.y += p.speedY * speedMultiplier;
       
@@ -827,12 +831,16 @@ class AudiovisualInstallation {
       // Traînée (trails) - plus long quand énergie élevée
       if (this.trails[index]) {
         this.trails[index].push({x: p.x, y: p.y});
-        const maxTrailLength = 8 + Math.floor(this.state.energy * 12); // 8 → 20 points
+        const baseTrailLength = this.isSmartphone ? 4 : 8;
+        const energyTrailLength = this.isSmartphone ? 4 : 12;
+        const maxTrailLength = Math.round((baseTrailLength + this.state.energy * energyTrailLength) * this.renderQuality);
         if (this.trails[index].length > maxTrailLength) {
           this.trails[index].shift();
         }
         
+        const trailStep = this.renderQuality < 0.8 ? 2 : 1;
         this.trails[index].forEach((point, i) => {
+          if (i % trailStep !== 0) return;
           const alpha = (i / this.trails[index].length) * 0.09;
           this.ctx.fillStyle = `hsla(${hue}, 80%, 50%, ${alpha})`;
           this.ctx.beginPath();
@@ -1100,13 +1108,21 @@ class AudiovisualInstallation {
       ? 0
       : Math.min((currentTime - this.lastFrameTime) / 1000, 0.05);
     this.lastFrameTime = currentTime;
+    if (deltaTime > 0) {
+      this.frameTimeAverage = this.frameTimeAverage * 0.9 + deltaTime * 0.1;
+      if (this.frameTimeAverage > 0.025) {
+        this.renderQuality = Math.max(0.5, this.renderQuality - 0.05);
+      } else if (this.frameTimeAverage < 0.018) {
+        this.renderQuality = Math.min(1, this.renderQuality + 0.02);
+      }
+    }
     this.state.time++;
     
     this.updateAudio();
     this.updateRain(deltaTime);
     this.updateVolcano(deltaTime);
     this.updateBlackHole(deltaTime);
-    this.updateParticles();
+    this.updateParticles(deltaTime);
     this.updateText();
     if (this.textState && this.textState.isFinished) this.textState.finalTime += deltaTime;
     this.draw();
