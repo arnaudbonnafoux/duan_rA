@@ -18,6 +18,7 @@
     <meta name="twitter:image" content="https://www.duanra.fr/images/visuel_30.webp">
     <meta name="theme-color" content="#340b5a">
     <meta name="author" content="duan rA">
+    <meta name="robots" content="index, follow, max-snippet:160, max-image-preview:large">
     <link rel="canonical" href="https://www.duanra.fr/">
     <link rel="icon" type="image/webp" href="images/visuel_30.webp">
     <link rel="apple-touch-icon" href="images/visuel_30.webp">
@@ -60,6 +61,7 @@
     </header>
 
     <main>
+    <p class="intro">Explorez l'invisible à travers la musique, les arts visuels et l'installation web. duan rA est un projet artistique qui rend visible et audible les dimensions cachées qui nous entourent.</p>
     <h2 id="galleryTitle">Galerie "Viae Errantes"</h2>
 
     <!-- Onglets pour galeries et installation -->
@@ -69,10 +71,10 @@
     </div>
 
     <!-- Galerie 1 (par défaut) -->
-    <div id="gallery1" class="gallery-container" role="main"></div>
+    <div id="gallery1" class="gallery-container"></div>
 
     <!-- Galerie 2 (cachée) -->
-    <div id="gallery2" class="gallery-container hidden" role="main" style="display:none;"></div>
+    <div id="gallery2" class="gallery-container hidden" style="display:none;"></div>
 
     <!-- Installation Audiovisuelle (modale) -->
     <div id="installationOverlay" class="installation-overlay hidden" role="dialog" aria-label="Cyclops Sonoris - Installation audiovisuelle générative" style="display:none;">
@@ -85,7 +87,7 @@
     </main>
 
     <footer>
-        <section class="artist-signup" aria-labelledby="artist-signup-title">
+        <section class="artist-signup" aria-labelledby="artist-signup-title" data-nosnippet>
             <h2 id="artist-signup-title">Rejoindre le projet</h2>
             <p>Artiste, musicien·ne ou créateur·ice, présentez-vous et parlons de ce que nous pourrions imaginer ensemble.</p>
             <p>(IA artistes bienvenues, précise ton modèle et ta tech 😉)</p>
