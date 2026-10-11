@@ -105,11 +105,11 @@ class AudiovisualInstallation {
   // 0 → 1 → 0 en boucle : approche du volcan, pause, retour à la place d'origine, pause
   blackHoleApproach() {
     const ts = this.textState;
-    if (!ts || !ts.isFinished) return 0;
+    if (!ts || !ts.sceneStarted) return 0;
     const start = ts.entrances.blackHole + ts.entranceFade + 20;
     const travel = 120; // secondes pour chaque trajet
     const pause = 15;   // secondes d'immobilité à chaque extrémité
-    const t = ts.finalTime - start;
+    const t = ts.sceneTime - start;
     if (t <= 0) return 0;
     const cycle = (travel + pause) * 2;
     const c = t % cycle;
@@ -324,7 +324,14 @@ class AudiovisualInstallation {
       this.filter.frequency.value = 700; // Coupure plus basse : son plus doux
       // Gain du drone seul : coupé quand le trou noir est à la verticale du volcan
       this.droneGain = this.audioContext.createGain();
-      this.droneGain.connect(this.filter);
+      // Panoramique du drone, déplacé à chaque glissement d'un demi-ton
+      if (this.audioContext.createStereoPanner) {
+        this.dronePanner = this.audioContext.createStereoPanner();
+        this.droneGain.connect(this.dronePanner);
+        this.dronePanner.connect(this.filter);
+      } else {
+        this.droneGain.connect(this.filter);
+      }
       this.filter.Q.value = 0.4;
       
       // Créer une reverb avec des delays et feedback
@@ -414,8 +421,8 @@ class AudiovisualInstallation {
   // Planifie en avance les frappes de tambour sur l'horloge audio
   scheduleDrums() {
     const ctx = this.audioContext;
-    // Le tambour arrive quand le second texte a disparu
-    if (this.textState && !this.textState.isFinished) return;
+    // Le tambour entre dès que le texte commence
+    if (this.textState && !this.textState.sceneStarted) return;
     if (this.nextBeatTime === undefined) {
       this.nextBeatTime = ctx.currentTime + 0.5;
       this.beatIndex = 0;
@@ -444,7 +451,7 @@ class AudiovisualInstallation {
   // Vrai quand le dernier élément graphique (trou noir) est entièrement apparu
   allElementsVisible() {
     const ts = this.textState;
-    return !ts || (ts.isFinished && ts.finalTime >= ts.entrances.blackHole + ts.entranceFade);
+    return !ts || (ts.sceneStarted && ts.sceneTime >= ts.entrances.blackHole + ts.entranceFade);
   }
 
   ensureNoiseBuffer() {
@@ -596,6 +603,7 @@ class AudiovisualInstallation {
       if (now >= this.nextPitchChange) {
         this.pitchLowered = !this.pitchLowered;
         this.nextPitchChange = now + (this.pitchLowered ? 50 + Math.random() * 15 : 45 + Math.random() * 30);
+        this.panOnPitchChange(now, this.pitchLowered);
       }
       const pitchRatio = this.pitchLowered ? Math.pow(2, -1 / 12) : 1;
 
@@ -633,6 +641,16 @@ class AudiovisualInstallation {
     }
   }
   
+  // Le son suit son glissement : vers la gauche en descendant, vers la droite en remontant, puis retour au centre
+  panOnPitchChange(now, lowered) {
+    if (!this.dronePanner) return;
+    const pan = this.dronePanner.pan;
+    const side = lowered ? -0.7 : 0.7;
+    pan.cancelScheduledValues(now);
+    pan.setTargetAtTime(side, now, 6);
+    pan.setTargetAtTime(0, now + 20, 8);
+  }
+
   stopAudio() {
     if (this.audioActive && this.oscillators.length > 0) {
       this.oscillators.forEach(osc => {
@@ -969,22 +987,30 @@ class AudiovisualInstallation {
 
   setupText() {
     const texts = AudiovisualInstallation.TEXTS[this.detectTextLanguage()];
+    const shufflePhrases = phrases => {
+      const shuffled = [...phrases];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    };
     this.textState = {
-      phrases: texts.phrases,
-      returnPhrases: texts.returnPhrases,
+      phrases: shufflePhrases(texts.phrases),
+      returnPhrases: shufflePhrases(texts.returnPhrases),
       returnGapFrames: 900,  // 15 secondes de silence avant le retour
       
-      // Timing : 15 secondes d'affichage total
-      displayDuration: 2700,  // 45 secondes (2700 frames à 60fps)
+      // 75 secondes par séquence, soit 15 secondes par phrase
+      displayDuration: 4500,  // 4500 frames à 60fps
       initialDelayFrames: 360,  // Délai initial de 6 secondes avant affichage
       
       // État courant
       frameCounter: 0,
       isDisplaying: false,
       isComplete: false,
-      isFinished: false,  // second texte terminé
-      finalTime: 0,       // secondes écoulées depuis la fin du second texte
-      // Entrée échelonnée des éléments graphiques (secondes après la fin du second texte)
+      sceneStarted: false,  // le texte a commencé : tambour et éléments graphiques peuvent entrer
+      sceneTime: 0,         // secondes écoulées depuis l'apparition de la première phrase
+      // Entrée échelonnée des éléments graphiques (secondes après l'apparition de la première phrase)
       entrances: { rain: 8, volcano: 22, blackHole: 36 },
       entranceFade: 10
     };
@@ -1002,6 +1028,8 @@ class AudiovisualInstallation {
       return;
     }
     
+    ts.sceneStarted = true;
+
     // Vérifier si on est dans la plage d'affichage
     const framesSinceDelay = ts.frameCounter - ts.initialDelayFrames;
     if (framesSinceDelay < ts.displayDuration) {
@@ -1010,17 +1038,14 @@ class AudiovisualInstallation {
       ts.isDisplaying = false;
       ts.isComplete = true;
     }
-    if (framesSinceDelay > ts.displayDuration * 2 + ts.returnGapFrames) {
-      ts.isFinished = true;
-    }
   }
 
   // Opacité (0 → 1) d'un élément graphique selon son délai d'entrée
   entranceAlpha(name) {
     const ts = this.textState;
     if (!ts) return 1;
-    if (!ts.isFinished) return 0;
-    const t = (ts.finalTime - ts.entrances[name]) / ts.entranceFade;
+    if (!ts.sceneStarted) return 0;
+    const t = (ts.sceneTime - ts.entrances[name]) / ts.entranceFade;
     const x = Math.min(1, Math.max(0, t));
     return x * x * (3 - 2 * x);
   }
@@ -1073,31 +1098,23 @@ class AudiovisualInstallation {
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     
-    // Afficher au centre avec espacement vertical
+    // Afficher une phrase à la fois, dans l'ordre aléatoire préparé au démarrage
     const centerX = this.width / 2;
     const centerY = this.height / 2;
-    const lineSpacing = fontSize * 1.6;
-    const startY = centerY - (lineSpacing * 2); // Commencer 2 lignes avant le centre
-    
-    // Afficher les 5 phrases empilées verticalement
-    // Apparition progressive : chaque phrase s'estompe 6 s après la précédente
-    const fadeInFrames = 600;
-    const fadeInStagger = 360;
-    phrases.forEach((phrase, index) => {
-      const yPos = startY + (index * lineSpacing);
-      const linearIn = Math.min(1, Math.max(0, (localFrame - index * fadeInStagger) / fadeInFrames));
-      const fadeIn = linearIn * linearIn * (3 - 2 * linearIn); // smoothstep
-      const phraseOpacity = opacity * fadeIn;
-      if (phraseOpacity <= 0) return;
-      
-      // Ombre pour lisibilité
+    const framesPerPhrase = ts.displayDuration / phrases.length;
+    const phraseIndex = Math.min(phrases.length - 1, Math.floor(localFrame / framesPerPhrase));
+    const phraseFrame = localFrame - phraseIndex * framesPerPhrase;
+    const transitionFrames = 240;
+    const fadeIn = Math.min(1, phraseFrame / transitionFrames);
+    const fadeOut = Math.min(1, (framesPerPhrase - phraseFrame) / transitionFrames);
+    const phraseOpacity = opacity * Math.min(fadeIn, fadeOut);
+    if (phraseOpacity > 0) {
+      const phrase = phrases[phraseIndex];
       this.ctx.fillStyle = `rgba(0, 0, 0, ${0.7 * phraseOpacity})`;
-      this.ctx.fillText(phrase, centerX + 2, yPos + 2);
-      
-      // Texte principal blanc avec opacité variable
+      this.ctx.fillText(phrase, centerX + 2, centerY + 2);
       this.ctx.fillStyle = `rgba(255, 255, 255, ${0.95 * phraseOpacity})`;
-      this.ctx.fillText(phrase, centerX, yPos);
-    });
+      this.ctx.fillText(phrase, centerX, centerY);
+    }
     
     this.ctx.restore();
   }
@@ -1124,7 +1141,7 @@ class AudiovisualInstallation {
     this.updateBlackHole(deltaTime);
     this.updateParticles(deltaTime);
     this.updateText();
-    if (this.textState && this.textState.isFinished) this.textState.finalTime += deltaTime;
+    if (this.textState && this.textState.sceneStarted) this.textState.sceneTime += deltaTime;
     this.draw();
     this.drawText();
     
