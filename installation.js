@@ -308,6 +308,7 @@ class AudiovisualInstallation {
       
       this.oscillators = [];
       this.gains = [];
+      this.oscPanners = [];
       
       // Fréquences calculées: 95 × φ^(2i)
       const frequencies = [
@@ -389,7 +390,15 @@ class AudiovisualInstallation {
         gain.gain.value = targetGains[i];
         
         osc.connect(gain);
-        gain.connect(this.droneGain);
+        // Chaque harmonique a son propre panoramique, qui dérive lentement
+        if (this.audioContext.createStereoPanner) {
+          const panner = this.audioContext.createStereoPanner();
+          gain.connect(panner);
+          panner.connect(this.droneGain);
+          this.oscPanners.push(panner);
+        } else {
+          gain.connect(this.droneGain);
+        }
         
         // Connecter le LFO pour moduler le volume
         this.lfoGain.connect(gain.gain);
@@ -421,8 +430,8 @@ class AudiovisualInstallation {
   // Planifie en avance les frappes de tambour sur l'horloge audio
   scheduleDrums() {
     const ctx = this.audioContext;
-    // Le tambour entre dès que le texte commence
-    if (this.textState && !this.textState.sceneStarted) return;
+    // Le tambour entre quand le second texte a disparu
+    if (this.textState && !this.textState.textEnded) return;
     if (this.nextBeatTime === undefined) {
       this.nextBeatTime = ctx.currentTime + 0.5;
       this.beatIndex = 0;
@@ -614,7 +623,14 @@ class AudiovisualInstallation {
           10
         );
       });
-      
+
+      // Spatialisation : chaque harmonique se balance à sa propre vitesse, sur presque toute la largeur stéréo
+      this.oscPanners.forEach((panner, i) => {
+        const period = 23 + i * 11; // secondes, périodes différentes pour ne jamais se resynchroniser
+        const target = Math.sin(now * (2 * Math.PI) / period + i * 1.9) * 0.9;
+        panner.pan.setTargetAtTime(target, now, 1.5);
+      });
+
       // Calculer l'énergie totale du drone (somme des gains)
       let totalEnergy = 0;
       this.gains.forEach(gain => {
@@ -645,7 +661,7 @@ class AudiovisualInstallation {
   panOnPitchChange(now, lowered) {
     if (!this.dronePanner) return;
     const pan = this.dronePanner.pan;
-    const side = lowered ? -0.7 : 0.7;
+    const side = lowered ? -1 : 1;
     pan.cancelScheduledValues(now);
     pan.setTargetAtTime(side, now, 6);
     pan.setTargetAtTime(0, now + 20, 8);
@@ -1008,7 +1024,8 @@ class AudiovisualInstallation {
       frameCounter: 0,
       isDisplaying: false,
       isComplete: false,
-      sceneStarted: false,  // le texte a commencé : tambour et éléments graphiques peuvent entrer
+      sceneStarted: false,  // le texte a commencé : les éléments graphiques peuvent entrer
+      textEnded: false,     // second texte terminé : le tambour peut entrer
       sceneTime: 0,         // secondes écoulées depuis l'apparition de la première phrase
       // Entrée échelonnée des éléments graphiques (secondes après l'apparition de la première phrase)
       entrances: { rain: 8, volcano: 22, blackHole: 36 },
@@ -1037,6 +1054,9 @@ class AudiovisualInstallation {
     } else {
       ts.isDisplaying = false;
       ts.isComplete = true;
+    }
+    if (framesSinceDelay > ts.displayDuration * 2 + ts.returnGapFrames) {
+      ts.textEnded = true;
     }
   }
 
