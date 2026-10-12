@@ -297,27 +297,43 @@ class AudiovisualInstallation {
   
   // =================== WEB AUDIO API ===================
   
+  // Fréquences du drone : base × φ^(2i), les deux dernières légèrement abaissées
+  droneFrequencies() {
+    const baseFreq = 75;
+    const phi = (1 + Math.sqrt(5)) / 2;
+    return [
+      baseFreq,                              // 75 Hz
+      baseFreq * Math.pow(phi, 2),           // ≈ 196 Hz
+      baseFreq * Math.pow(phi, 4),           // ≈ 514 Hz
+      baseFreq * Math.pow(phi, 6) * 0.80,    // ≈ 1077 Hz
+      baseFreq * Math.pow(phi, 8) * 0.85     // ≈ 2995 Hz
+    ];
+  }
+
   initAudio() {
     try {
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
       
+      // Reprise du contexte (politique d'autoplay, Safari/iOS, retour d'onglet)
+      this.resumeAudio = () => {
+        const ctx = this.audioContext;
+        if (ctx && (ctx.state === 'suspended' || ctx.state === 'interrupted')) {
+          ctx.resume().catch(() => {});
+        }
+      };
+      this.resumeAudio();
+      ['pointerdown', 'keydown', 'touchend', 'visibilitychange'].forEach(ev =>
+        document.addEventListener(ev, this.resumeAudio, { passive: true })
+      );
+      
       // Créer 5 oscillateurs avec fréquences basées sur le nombre d'or (φ)
-      const baseFreq = 75; // Fréquence de base
-      const phi = (1 + Math.sqrt(5)) / 2; // Nombre d'or ≈ 1.618
       const waveTypes = ['sine', 'sine', 'sine', 'sine', 'sine'];
       
       this.oscillators = [];
       this.gains = [];
       this.oscPanners = [];
       
-      // Fréquences calculées: 95 × φ^(2i)
-      const frequencies = [
-        baseFreq,                              // 95 Hz
-        baseFreq * Math.pow(phi, 2),           // 248.7 Hz
-        baseFreq * Math.pow(phi, 4),           // 651.1 Hz
-        baseFreq * Math.pow(phi, 6) * 0.80,    // 1363.8 Hz
-        baseFreq * Math.pow(phi, 8) * 0.85     // 3793.5 Hz
-      ];
+      const frequencies = this.droneFrequencies();
       
       // Créer un filtre lowpass pour moduler le timbre
       this.filter = this.audioContext.createBiquadFilter();
@@ -362,20 +378,27 @@ class AudiovisualInstallation {
         this.delayNodes.push(delayNode);
       });
       
+      // Bus des percussions : son direct + envoi vers les lignes à retard (vraie réverbération)
+      this.percBus = this.audioContext.createGain();
+      const percSend = this.audioContext.createGain();
+      percSend.gain.value = 0.6;
+      this.percBus.connect(this.dryGain);
+      this.percBus.connect(percSend);
+      this.delayNodes.forEach(delayNode => percSend.connect(delayNode));
+      
       // Dry signal (direct sans reverb)
       this.filter.connect(this.dryGain);
       
       // Créer un LFO (Low Frequency Oscillator) pour moduler l'amplitude
       this.lfo = this.audioContext.createOscillator();
-      this.lfoGain = this.audioContext.createGain();
       this.lfo.frequency.value = 0.08; // Modulation très lente
-      this.lfoGain.gain.value = 0.10; // Force de la modulation réduite
-      this.lfo.connect(this.lfoGain);
+      const lfoRelativeDepth = 0.35; // profondeur relative au gain de chaque harmonique
       
       // Créer un master gain pour le fade-in au démarrage
       this.masterGain = this.audioContext.createGain();
       this.masterGain.gain.value = 0; // Commence à 0
       this.fadeInStartTime = null;
+      this.fadeDone = false;
       
       for (let i = 0; i < 5; i++) {
         const osc = this.audioContext.createOscillator();
@@ -400,8 +423,11 @@ class AudiovisualInstallation {
           gain.connect(this.droneGain);
         }
         
-        // Connecter le LFO pour moduler le volume
-        this.lfoGain.connect(gain.gain);
+        // Le LFO module le volume de chaque harmonique proportionnellement à son gain
+        const lfoDepth = this.audioContext.createGain();
+        lfoDepth.gain.value = targetGains[i] * lfoRelativeDepth;
+        this.lfo.connect(lfoDepth);
+        lfoDepth.connect(gain.gain);
         
         osc.start();
         
@@ -410,10 +436,19 @@ class AudiovisualInstallation {
       }
       this.lfo.start();
       
+      // Limiteur en sortie : évite la saturation quand tambour et drone se cumulent
+      const limiter = this.audioContext.createDynamicsCompressor();
+      limiter.threshold.value = -10;
+      limiter.knee.value = 10;
+      limiter.ratio.value = 8;
+      limiter.attack.value = 0.005;
+      limiter.release.value = 0.3;
+      
       // Connecter le filtre à la sortie avec master gain (dry + wet)
       this.dryGain.connect(this.masterGain);
       this.wetGain.connect(this.masterGain);
-      this.masterGain.connect(this.audioContext.destination);
+      this.masterGain.connect(limiter);
+      limiter.connect(this.audioContext.destination);
       
       // Créer le son
       this.audioActive = true;
@@ -437,6 +472,13 @@ class AudiovisualInstallation {
       this.beatIndex = 0;
     }
     const stepDuration = 0.5; // Croche à 60 BPM : pulsation lente
+    // Après un onglet masqué, on saute les pas manqués au lieu de les rejouer en rafale
+    const lag = ctx.currentTime - this.nextBeatTime;
+    if (lag > 0.1) {
+      const skipped = Math.ceil(lag / stepDuration);
+      this.nextBeatTime += skipped * stepDuration;
+      this.beatIndex += skipped;
+    }
     // Motif de 8 pas : 0 = silence, sinon intensité (tambour grave, ternaire discret)
     const pattern = [1, 0, 0.45, 0, 0.8, 0, 0.45, 0.3];
     // Caisse claire légère sur les temps 2 et 4, avec une ghost note discrète
@@ -450,17 +492,11 @@ class AudiovisualInstallation {
         this.playDrum(this.nextBeatTime, firstHitVelocity);
       }
       const snareVelocity = snarePattern[this.beatIndex % snarePattern.length];
-      if (snareVelocity > 0 && this.allElementsVisible()) this.playSnare(this.nextBeatTime, snareVelocity);
-      if (this.allElementsVisible()) this.playHiHat(this.nextBeatTime, hatPattern[this.beatIndex % hatPattern.length]);
+      if (snareVelocity > 0) this.playSnare(this.nextBeatTime, snareVelocity);
+      this.playHiHat(this.nextBeatTime, hatPattern[this.beatIndex % hatPattern.length]);
       this.nextBeatTime += stepDuration;
       this.beatIndex++;
     }
-  }
-
-  // Vrai quand le dernier élément graphique (trou noir) est entièrement apparu
-  allElementsVisible() {
-    const ts = this.textState;
-    return !ts || (ts.sceneStarted && ts.sceneTime >= ts.entrances.blackHole + ts.entranceFade);
   }
 
   ensureNoiseBuffer() {
@@ -487,10 +523,7 @@ class AudiovisualInstallation {
     env.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
     noise.connect(high);
     high.connect(env);
-    env.connect(this.dryGain);
-    env.connect(this.wetGain);
-    noise.start(time);
-    noise.stop(time + 0.07);
+    env.connect(this.percBus);
   }
 
   playSnare(time, velocity) {
@@ -526,8 +559,7 @@ class AudiovisualInstallation {
     const out = ctx.createGain();
     noiseEnv.connect(out);
     bodyEnv.connect(out);
-    out.connect(this.dryGain);
-    out.connect(this.wetGain);
+    out.connect(this.percBus);
 
     noise.start(time);
     noise.stop(time + 0.2);
@@ -539,7 +571,7 @@ class AudiovisualInstallation {
     const ctx = this.audioContext;
     const env = ctx.createGain();
     env.gain.setValueAtTime(0.0001, time);
-    env.gain.exponentialRampToValueAtTime(0.42 * velocity, time + 0.005);
+    env.gain.exponentialRampToValueAtTime(0.2 * velocity, time + 0.005);
     env.gain.exponentialRampToValueAtTime(0.0001, time + 0.6);
 
     // Corps : sinus + triangle pour des harmoniques plus claires
@@ -561,8 +593,7 @@ class AudiovisualInstallation {
     tone.type = 'lowpass';
     tone.frequency.value = 700;
     env.connect(tone);
-    tone.connect(this.dryGain);
-    tone.connect(this.wetGain);
+    tone.connect(this.percBus);
   }
 
   updateAudio() {
@@ -574,10 +605,12 @@ class AudiovisualInstallation {
         this.fadeInStartTime = Date.now();
       }
       
-      const elapsedMs = Date.now() - this.fadeInStartTime;
-      const fadeDurationMs = 3000; // 3 secondes
-      const fadeProgress = Math.min(1, elapsedMs / fadeDurationMs);
-      this.masterGain.gain.value = fadeProgress;
+      if (!this.fadeDone) {
+        const elapsedMs = Date.now() - this.fadeInStartTime;
+        const fadeProgress = Math.min(1, elapsedMs / 3000); // 3 secondes
+        this.masterGain.gain.value = fadeProgress;
+        if (fadeProgress >= 1) this.fadeDone = true;
+      }
       
       this.scheduleDrums();
 
@@ -592,16 +625,7 @@ class AudiovisualInstallation {
 
       // Faire dériver les fréquences lentement
       const drift = Math.sin(this.state.time * 0.0005) * 0.5; // Dérive presque imperceptible
-      const baseFreq = 75;
-      const phi = (1 + Math.sqrt(5)) / 2;
-      
-      const frequencies = [
-        baseFreq,
-        baseFreq * Math.pow(phi, 2),
-        baseFreq * Math.pow(phi, 4),
-        baseFreq * Math.pow(phi, 6) * 0.80,
-        baseFreq * Math.pow(phi, 8) * 0.85
-      ];
+      const frequencies = this.droneFrequencies();
       
       // De temps en temps, le drone glisse d'un demi-ton vers le bas, puis remonte
       const now = this.audioContext.currentTime;
@@ -631,13 +655,6 @@ class AudiovisualInstallation {
         panner.pan.setTargetAtTime(target, now, 1.5);
       });
 
-      // Calculer l'énergie totale du drone (somme des gains)
-      let totalEnergy = 0;
-      this.gains.forEach(gain => {
-        totalEnergy += gain.gain.value;
-      });
-      this.state.energy = totalEnergy / this.gains.length; // Moyenne pour normaliser
-      
       // Moduler la fréquence de coupure du filtre
       // Variation lente et fluide
       const filterFreq = 400 + Math.sin(this.state.time * 0.001) * 100 + Math.cos(this.state.time * 0.0008) * 50;
@@ -661,7 +678,8 @@ class AudiovisualInstallation {
   panOnPitchChange(now, lowered) {
     if (!this.dronePanner) return;
     const pan = this.dronePanner.pan;
-    const side = lowered ? -1 : 1;
+    // Limité à ±0.5 : au-delà, un panoramique en série replie le stéréo en mono
+    const side = lowered ? -0.5 : 0.5;
     pan.cancelScheduledValues(now);
     pan.setTargetAtTime(side, now, 6);
     pan.setTargetAtTime(0, now + 20, 8);
@@ -685,6 +703,16 @@ class AudiovisualInstallation {
       }
       
       this.audioActive = false;
+    }
+    if (this.resumeAudio) {
+      ['pointerdown', 'keydown', 'touchend', 'visibilitychange'].forEach(ev =>
+        document.removeEventListener(ev, this.resumeAudio)
+      );
+      this.resumeAudio = null;
+    }
+    if (this.audioContext) {
+      this.audioContext.close().catch(() => {});
+      this.audioContext = null;
     }
   }
   
@@ -1033,11 +1061,12 @@ class AudiovisualInstallation {
     };
   }
   
-  updateText() {
+  updateText(deltaTime) {
     if (!this.textState) return;
     
     const ts = this.textState;
-    ts.frameCounter++;
+    // Compté en images équivalentes à 60 fps : le rythme ne dépend pas de la fréquence de l'écran
+    ts.frameCounter += deltaTime * 60;
     
     // Vérifier si on est dans la phase de délai initial
     if (ts.frameCounter < ts.initialDelayFrames) {
@@ -1153,14 +1182,14 @@ class AudiovisualInstallation {
         this.renderQuality = Math.min(1, this.renderQuality + 0.02);
       }
     }
-    this.state.time++;
+    this.state.time += deltaTime * 60; // images équivalentes à 60 fps
     
     this.updateAudio();
     this.updateRain(deltaTime);
     this.updateVolcano(deltaTime);
     this.updateBlackHole(deltaTime);
     this.updateParticles(deltaTime);
-    this.updateText();
+    this.updateText(deltaTime);
     if (this.textState && this.textState.sceneStarted) this.textState.sceneTime += deltaTime;
     this.draw();
     this.drawText();
@@ -1328,19 +1357,7 @@ window.AudiovisualInstallation = AudiovisualInstallation;
       });
     }
     
-    // Fermeture par fond
-    installationOverlay.addEventListener('click', (e) => {
-      if (e.target === installationOverlay) {
-        window.destroyInstallation();
-      }
-    });
-    
-    // Fermeture par Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && installationOverlay && installationOverlay.style.display === 'flex') {
-        window.destroyInstallation();
-      }
-    });
+    // Mode exposition : pas de fermeture par le fond ni par Escape (cohérent avec script.js)
   }
   
   // Attendre que le DOM soit chargé
