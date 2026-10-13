@@ -1,27 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://duanra.fr/</loc>
-    <lastmod>2026-03-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
+    <loc>https://www.duanra.fr/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <image:image>
+      <image:loc>https://www.duanra.fr/images/visuel_30.webp</image:loc>
+      <image:title>Dissonantia Harmoniosa</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://duanra.fr/mentions_légales.html</loc>
+    <loc>https://www.duanra.fr/mentions_l%C3%A9gales.html</loc>
     <lastmod>2026-03-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://duanra.fr/cgu.html</loc>
-    <lastmod>2026-03-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>  
-  <url>
-    <loc>https://duanra.fr/cgu.html</loc>
+    <loc>https://www.duanra.fr/cgu.html</loc>
     <lastmod>2026-07-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
   </url>
 </urlset>
