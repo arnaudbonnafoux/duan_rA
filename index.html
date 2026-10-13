@@ -5,17 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Explorez l'invisible à travers la musique, les arts visuels et l'installation web. duan rA est un projet artistique qui rend visible et audible les dimensions cachées qui nous entourent.">
-    <meta name="keywords" content="musique, arts visuels, installation web, art numérique, synthèse sonore, projet artistique">
-    <meta property="og:title" content="Projet duan rA - Rendre l'invisible visible ">
+    <meta property="og:title" content="Projet duan rA - Rendre l'invisible visible">
     <meta property="og:description" content="Explorez l'invisible à travers la musique, les arts visuels et l'installation web. Un projet artistique qui capture l'essence de ce qui reste caché, par l'expérimentation et l'intuition.">
     <meta property="og:image" content="https://www.duanra.fr/images/visuel_30.webp">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Projet duan rA">
+    <meta property="og:image:width" content="1920">
+    <meta property="og:image:height" content="1920">
+    <meta property="og:image:alt" content="Dissonantia Harmoniosa - Œuvre d'art numérique du projet duan rA">
     <meta property="og:url" content="https://www.duanra.fr/">
     <meta property="og:locale" content="fr_FR">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="duan rA - Rendre l'invisible visible">
     <meta name="twitter:description" content="Explorez l'invisible à travers la musique, les arts visuels et l'installation web.">
     <meta name="twitter:image" content="https://www.duanra.fr/images/visuel_30.webp">
+    <meta name="twitter:image:alt" content="Dissonantia Harmoniosa - Œuvre d'art numérique du projet duan rA">
     <meta name="theme-color" content="#340b5a">
     <meta name="author" content="duan rA">
     <meta name="robots" content="index, follow, max-snippet:160, max-image-preview:large">
@@ -31,15 +35,273 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "duan rA",
-      "url": "https://www.duanra.fr",
-      "email": "projet.duanra@orange.fr",
-      "jobTitle": "Artiste contemporain",
-    "description": "Musique, Arts Visuels, Installation Web. Un projet qui explore l'invisible par l'expérimentation.",
-      "sameAs": ["https://www.instagram.com/projet_duanra/", "https://arnaudbonnafoux.github.io/"],
-      "image": "https://www.duanra.fr/images/visuel_30.webp",
-    "knowsAbout": ["Musique", "Arts Visuels", "Installation Web", "Synthèse Sonore"]
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://www.duanra.fr/#website",
+          "url": "https://www.duanra.fr/",
+          "name": "Projet duan rA",
+          "inLanguage": "fr-FR",
+          "publisher": {
+            "@id": "https://www.duanra.fr/#artist"
+          }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://www.duanra.fr/#artist",
+          "name": "duan rA",
+          "url": "https://www.duanra.fr/",
+          "email": "projet.duanra@orange.fr",
+          "jobTitle": "Artiste contemporain",
+          "description": "Musique, Arts Visuels, Installation Web. Un projet qui explore l'invisible par l'expérimentation.",
+          "sameAs": [
+            "https://www.instagram.com/projet_duanra/",
+            "https://arnaudbonnafoux.github.io/"
+          ],
+          "image": "https://www.duanra.fr/images/visuel_30.webp",
+          "knowsAbout": [
+            "Musique",
+            "Arts Visuels",
+            "Installation Web",
+            "Synthèse Sonore"
+          ]
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://www.duanra.fr/#webpage",
+          "url": "https://www.duanra.fr/",
+          "name": "Projet duan rA | Musique, Arts Visuels, Installation Web",
+          "isPartOf": {
+            "@id": "https://www.duanra.fr/#website"
+          },
+          "about": {
+            "@id": "https://www.duanra.fr/#artist"
+          },
+          "primaryImageOfPage": {
+            "@type": "ImageObject",
+            "contentUrl": "https://www.duanra.fr/images/visuel_30.webp"
+          },
+          "inLanguage": "fr-FR"
+        },
+        {
+          "@type": "ImageGallery",
+          "name": "Galerie Viae Errantes",
+          "isPartOf": {
+            "@id": "https://www.duanra.fr/#webpage"
+          },
+          "image": [
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_1.webp",
+              "name": "Alienus Omnium",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_2.webp",
+              "name": "Splendores Nihili",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_3.webp",
+              "name": "Topographia Somni",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_4.webp",
+              "name": "Fragmentum Temporis",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_6.webp",
+              "name": "Cyclops Sonoris",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_7.webp",
+              "name": "Respiratio Vacui",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_8.webp",
+              "name": "Spectra Lucis",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_9.webp",
+              "name": "Fluxus Aeternalis",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_10.webp",
+              "name": "Materia Spiritus",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_11.webp",
+              "name": "Echoes Silentii",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_13.webp",
+              "name": "Cartographia Invisibilis",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_14.webp",
+              "name": "Osmosis Colorum",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ImageGallery",
+          "name": "Galerie Revolutiones Formales",
+          "isPartOf": {
+            "@id": "https://www.duanra.fr/#webpage"
+          },
+          "image": [
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_24.webp",
+              "name": "Saltus Tincturarum",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_25.webp",
+              "name": "Fusio Colorata",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_26.webp",
+              "name": "Murmura Chromatica",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_27.webp",
+              "name": "Symphonia Tacita",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_28.webp",
+              "name": "Vibratio Chromatica",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_29.webp",
+              "name": "Vertigo Abyssi",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_30.webp",
+              "name": "Dissonantia Harmoniosa",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_31.webp",
+              "name": "Crescendo Visualis",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_34.webp",
+              "name": "Resonantia Infinita",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_35.webp",
+              "name": "Conclusio Somnialis",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_36.webp",
+              "name": "Fluxus Modularis",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_37.webp",
+              "name": "Geometria Chromatica",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            },
+            {
+              "@type": "ImageObject",
+              "contentUrl": "https://www.duanra.fr/images/visuel_38.webp",
+              "name": "Nexus Formalis",
+              "creator": {
+                "@id": "https://www.duanra.fr/#artist"
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
     <script src="script.js" defer></script>

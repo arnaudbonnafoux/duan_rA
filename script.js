@@ -168,7 +168,7 @@ const bioText = document.createElement('div');
 bioText.className = 'bio-text';
 bioText.innerHTML = `
   <h2>Le projet duan rA</h2>
-  <p>Le projet duran rA est une démarche artistique où musique, arts visuels et création web se répondent, ouvrant des passages vers l'invisible.</p>
+  <p>Le projet duan rA est une démarche artistique où musique, arts visuels et création web se répondent, ouvrant des passages vers l'invisible.</p>
   <p>Ce site « vitrine » propose plusieurs galeries de visuels illustrant les albums, EP et singles produits par les musiciens du projet.</p>
   <p>En outre, ce site est lui-même un objet de création artistique comprenant des installations web associées à de la synthèse sonore.</p>
   <p>Le projet est né en 2025 ; il est donc destiné à évoluer très prochainement en fonction des aléas de la création elle-même et des rencontres entre artistes qu'elle pourrait provoquer.</p>
