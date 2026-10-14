@@ -168,14 +168,14 @@ const bioText = document.createElement('div');
 bioText.className = 'bio-text';
 bioText.innerHTML = `
   <h2>Le projet duan rA</h2>
-  <p>Le projet duan rA est une démarche artistique où musique, arts visuels et création web se répondent, ouvrant des passages vers l'invisible.</p>
-  <p>Ce site « vitrine » propose plusieurs galeries de visuels illustrant les albums, EP et singles produits par les musiciens du projet.</p>
-  <p>En outre, ce site est lui-même un objet de création artistique comprenant des installations web associées à de la synthèse sonore.</p>
-  <p>Le projet est né en 2025 ; il est donc destiné à évoluer très prochainement en fonction des aléas de la création elle-même et des rencontres entre artistes qu'elle pourrait provoquer.</p>
-  <p>Cette structure se veut aussi un refuge pour les artistes aux esthétiques mouvantes, qui ne se reconnaissent dans aucune forme figée et souhaitent créer librement, au gré des rencontres et des expérimentations.</p>
-  <p>L'esthétique du projet repose sur une intuition éprouvée : rendre visible et audible, par l'expérimentation, l'invisible — ces dimensions cachées qui nous entourent mais échappent à la perception.</p>
-  <p>L'intuition et l'introspection sont convoquées pour explorer cette perception primordiale et créer un ailleurs où l'imagination pose, avec authenticité, les fondements du vide et l'expression de son potentiel infini dans la création artistique.</p>
-  <p>Dans cette démarche, la <em>tabula rasa</em> n'est pas un effacement définitif, mais un point de départ : suspendre les formes et les certitudes pour laisser émerger, du vide, de nouvelles perceptions et possibilités de création.</p>
+  <p>Veyra nolume, sa meriva tolun; orae nim vera, lumis ta nara.</p>
+  <p>Nolira senum, vaelora misen, aruma tolun. Sera nim veyra, olune maris.</p>
+  <p>Orum nava seli, meriva ta solum; veyra nim, nolu vera, sa tolun.</p>
+  <p>Na 2025, veyra nolu meriva sa: aruma seli, orae tolun, lumis nara.</p>
+  <p>Velora senu, aruma nesori; nali meriva, tolun vera, seli veyra.</p>
+  <p>Veyra tolun lumis, nara meriva orum; sa nolu, seli maren, orae nim.</p>
+  <p>Nolira sa veyra, orum nava seli. Meriva tolun, lumis ta nara, aruma vera.</p>
+  <p>In nolu, veyra: sa meriva, tolun aruma, nali lumis, orae vera.</p>
 `;
 
 bioContent.appendChild(bioCLoseBtn);
