@@ -448,7 +448,11 @@ class AudiovisualInstallation {
       this.dryGain.connect(this.masterGain);
       this.wetGain.connect(this.masterGain);
       this.masterGain.connect(limiter);
-      limiter.connect(this.audioContext.destination);
+      // Gain de sortie (≈ +6 dB) après le limiteur : volume général plus fort sans saturation
+      this.outputGain = this.audioContext.createGain();
+      this.outputGain.gain.value = 2;
+      limiter.connect(this.outputGain);
+      this.outputGain.connect(this.audioContext.destination);
       
       // Créer le son
       this.audioActive = true;
@@ -571,7 +575,7 @@ class AudiovisualInstallation {
     const ctx = this.audioContext;
     const env = ctx.createGain();
     env.gain.setValueAtTime(0.0001, time);
-    env.gain.exponentialRampToValueAtTime(0.2 * velocity, time + 0.005);
+    env.gain.exponentialRampToValueAtTime(0.1 * velocity, time + 0.005);
     env.gain.exponentialRampToValueAtTime(0.0001, time + 0.6);
 
     // Corps : sinus + triangle pour des harmoniques plus claires
