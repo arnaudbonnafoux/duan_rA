@@ -523,7 +523,7 @@ class AudiovisualInstallation {
     high.frequency.value = 6500;
     const env = ctx.createGain();
     env.gain.setValueAtTime(0.0001, time);
-    env.gain.exponentialRampToValueAtTime(0.035 * velocity, time + 0.002);
+    env.gain.exponentialRampToValueAtTime(0.0175 * velocity, time + 0.002);
     env.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
     noise.connect(high);
     high.connect(env);
@@ -543,7 +543,7 @@ class AudiovisualInstallation {
     band.Q.value = 0.6;
     const noiseEnv = ctx.createGain();
     noiseEnv.gain.setValueAtTime(0.0001, time);
-    noiseEnv.gain.exponentialRampToValueAtTime(0.11 * velocity, time + 0.004);
+    noiseEnv.gain.exponentialRampToValueAtTime(0.03 * velocity, time + 0.004);
     noiseEnv.gain.exponentialRampToValueAtTime(0.0001, time + 0.18);
     noise.connect(band);
     band.connect(noiseEnv);
@@ -555,7 +555,7 @@ class AudiovisualInstallation {
     body.frequency.exponentialRampToValueAtTime(150, time + 0.08);
     const bodyEnv = ctx.createGain();
     bodyEnv.gain.setValueAtTime(0.0001, time);
-    bodyEnv.gain.exponentialRampToValueAtTime(0.08 * velocity, time + 0.003);
+    bodyEnv.gain.exponentialRampToValueAtTime(0.022 * velocity, time + 0.003);
     bodyEnv.gain.exponentialRampToValueAtTime(0.0001, time + 0.12);
     body.connect(bodyEnv);
 
@@ -574,12 +574,13 @@ class AudiovisualInstallation {
   playDrum(time, velocity) {
     const ctx = this.audioContext;
     const env = ctx.createGain();
-    env.gain.setValueAtTime(0.0001, time);
-    env.gain.exponentialRampToValueAtTime(0.1 * velocity, time + 0.005);
+    // Attaque linéaire depuis 0 : une rampe exponentielle de 5 ms claque sur un son grave
+    env.gain.setValueAtTime(0, time);
+    env.gain.linearRampToValueAtTime(0.1 * velocity, time + 0.006);
     env.gain.exponentialRampToValueAtTime(0.0001, time + 0.6);
 
     // Corps : sinus + triangle pour des harmoniques plus claires
-    [['sine', 1], ['triangle', 0.2]].forEach(([type, level]) => {
+    [['sine', 1], ['triangle', 0.35]].forEach(([type, level]) => {
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
       g.gain.value = level;
@@ -595,7 +596,7 @@ class AudiovisualInstallation {
     // Contourne le filtre passe-bas du drone (sinon le son est étouffé), mais garde la réverbération
     const tone = ctx.createBiquadFilter();
     tone.type = 'lowpass';
-    tone.frequency.value = 700;
+    tone.frequency.value = 1500;
     env.connect(tone);
     tone.connect(this.percBus);
   }
